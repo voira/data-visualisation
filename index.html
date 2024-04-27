@@ -112,43 +112,44 @@
         map.fitBounds(e.target.getBounds())
       }
 
-      // Sample distribution centers data (replace with actual data)
-      var distributionCenters = [
-        {
-          id: 1,
-          name: 'Distribution Center 1',
-          lat: 48.8566,
-          lng: 2.3522,
-          data: [
-            { quantity: 100, timeDifference: 10, label: 'DC1 Point 1' },
-            { quantity: 200, timeDifference: 20, label: 'DC1 Point 2' },
-            { quantity: 300, timeDifference: 15, label: 'DC1 Point 3' }
-            // Add more data points here for Distribution Center 1
-          ]
-        },
-        {
-          id: 2,
-          name: 'Distribution Center 2',
-          lat: 51.5074,
-          lng: -0.1278,
-          data: [
-            { quantity: 150, timeDifference: 12, label: 'DC2 Point 1' },
-            { quantity: 250, timeDifference: 18, label: 'DC2 Point 2' },
-            { quantity: 350, timeDifference: 25, label: 'DC2 Point 3' }
-            // Add more data points here for Distribution Center 2
-          ]
-        }
-        // Add more distribution centers here
-      ]
+      //Create overlay thingy
+      var Paris = L.marker([48.8566, 2.3522]).bindPopup('This is Paris')
+      London = L.marker([51.5074, -0.1278]).bindPopup('This is London')
+      AntwerpenP = L.marker([51.29999, 4.30758]).bindPopup(
+        'Antwerpen Production'
+      )
+      WroclavP = L.marker([51.11862, 16.99842]).bindPopup('Wrocłav Productions')
+      LyonP = L.marker([45.75555, 4.76737]).bindPopup('Lyon Productions')
+      AntwerpenDC = L.marker([51.2999, 4.30758]).bindPopup(
+        'Antwerpen Distribution Center'
+      )
+      WroclavDC = L.marker([51.11862, 16.99842]).bindPopup(
+        'Wrocłav Distribution Center'
+      )
+      LyonDC = L.marker([45.75555, 4.76737]).bindPopup(
+        'Lyon Distribution Center'
+      )
+      BirminghamDC = L.marker([52.42853, -1.89877]).bindPopup(
+        'Birmingham Distribution Center'
+      )
+      GoteborgDC = L.marker([57.72338, 11.85666]).bindPopup(
+        'Göteborg Distribution Center'
+      )
 
-      // Add distribution centers as markers
-      distributionCenters.forEach(function (center) {
-        var marker = L.marker([center.lat, center.lng]).addTo(map)
-        marker.bindPopup(center.name)
-        marker.on('click', function () {
-          updateScatterplot(center.data)
-        })
-      })
+      var Plants = L.layerGroup([AntwerpenP, WroclavP, LyonP])
+      DistC = L.layerGroup([
+        AntwerpenDC,
+        WroclavDC,
+        LyonDC,
+        BirminghamDC,
+        GoteborgDC
+      ])
+      var overlayMaps = {
+        'Distribution Centers': DistC,
+        'Production Plants': Plants
+      }
+
+      var layerControl = L.control.layers(0, overlayMaps).addTo(map)
 
       // Sample scatterplot data (default)
       var defaultScatterplotData = [
@@ -157,7 +158,6 @@
         { quantity: 300, timeDifference: 15, label: 'Point 3' }
         // Add more default data points here
       ]
-
       // Set up SVG dimensions
       var margin = { top: 20, right: 20, bottom: 30, left: 40 }
       var width = 600 - margin.left - margin.right
@@ -258,7 +258,54 @@
         svg.select('.y.axis').call(yAxis)
       }
 
+      //Scatterplot to SVG file
+      var svgElement = document.getElementById('scatterplot')
+
+
+
+      var legendContent = `
+  <div class="legend" style="background-color: white; padding: 10px;">
+    <h4>Legend</h4>
+    <svg class="legend-svg" width="200" height="100">
+      <!-- Your scatterplot SVG content here -->
+      <!-- For example: -->
+      <circle cx="50" cy="20" r="5" fill="green" />
+      <circle cx="100" cy="40" r="5" fill="blue" />
+      <!-- Add more circles or other SVG elements as needed -->
+    </svg>
+  </div>
+`;
+
+// Define custom CSS styles
+var customStyles = `
+  .legend {
+    background-color: white;
+    padding: 10px;
+  }
+  
+  .legend-svg {
+    /* Add styles for your scatterplot SVG */
+  }
+`;
+
+// Create a custom legend control
+var legendControl = L.control({position: 'bottomright'});
+
+legendControl.onAdd = function(map) {
+    var div = L.DomUtil.create('div', 'legend-container');
+    div.innerHTML = legendContent;
+    return div;
+};
+
+// Add the legend control to the map
+legendControl.addTo(map);
+
+// Inject custom styles into the document
+var style = document.createElement('style');
+style.innerHTML = customStyles;
+document.head.appendChild(style);
       // Color picker function for the map
+
       function getColor(d) {
         return d === 'Croatia' ||
           d === 'France' ||
