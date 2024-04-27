@@ -39,19 +39,26 @@
       // Initialize map
       var map = L.map('map').setView([51.505, -0.09], 4)
       var geoJson
+
       // Add tile layer
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map)
+
+      // Add GeoJson
+      geoJson = L.geoJson(euData, {
+        style: style,
+        onEachFeature: onEachFeature
       }).addTo(map)
 
       // Function for color
       function style(features) {
         return {
           fillColor: getColor(features.properties.NAME),
-          weight: 2,
+          weight: 1,
           opacity: 1,
           color: 'white',
-          dashArray: '3',
+          dashArray: '1',
           fillOpacity: 0.5
         }
       }
@@ -69,7 +76,7 @@
         var layer = e.target
 
         layer.setStyle({
-          weight: 2,
+          weight: 1,
           color: '#666',
           dashArray: '',
           fillOpacity: 0.7
@@ -80,19 +87,13 @@
 
       // Function for unhover
       function resetHighlight(e) {
-        geojson.resetStyle(e.target)
+        geoJson.resetStyle(e.target)
       }
 
       // Zooms in to country
       function zoomToFeature(e) {
         map.fitBounds(e.target.getBounds())
       }
-
-      // Add GeoJson
-      geoJson = L.geoJson(euData, {
-        style: style,
-        onEachFeature: onEachFeature
-      }).addTo(map)
 
       // Sample distribution centers data (replace with actual data)
       var distributionCenters = [
@@ -242,15 +243,32 @@
 
       // Color picker function for the map
       function getColor(d) {
-        return d > 1000
-          ? '#800026'
-          : d === 'Poland'
-          ? '#BD0026'
-          : d === 'Germany'
-          ? '#E31A1C'
-          : d === 'Belgium'
-          ? '#FC4E2A'
-          : '#FFEDA0'
+        return d === 'Croatia' ||
+          d === 'France' ||
+          d === 'Italy' ||
+          d === 'Portugal' ||
+          d === 'Slovenia' ||
+          d === 'Spain' ||
+          d === 'Switzerland'
+          ? '#99d594'
+          : d === 'Germany' || d === 'Belgium' || d === 'Netherlands'
+          ? '#fc8d59'
+          : d === 'Czech Republic' ||
+            d === 'Greece' ||
+            d === 'Hungary' ||
+            d === 'Poland'
+          ? '#beaed4'
+          : d === 'United Kingdom'
+          ? '#fbb4ae'
+          : d === 'Denmark' ||
+            d === 'Sweden' ||
+            d === 'Estonia' ||
+            d === 'Finland' ||
+            d === 'Latvia' ||
+            d === 'Lithuania' ||
+            d === 'Norway'
+          ? '#91bfdb'
+          : '#bdbdbd'
       }
     </script>
   </body>
