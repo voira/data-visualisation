@@ -38,12 +38,27 @@
     <script>
       // Initialize map
       var map = L.map('map').setView([51.505, -0.09], 4)
+      map.createPane('labels')
+      map.getPane('labels').style.zIndex = 650
+      map.getPane('labels').style.pointerEvents = 'none'
+
       var geoJson
 
       // Add tile layer
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map)
+      L.tileLayer(
+        'https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',
+        {
+          attribution: '©OpenStreetMap, ©CartoDB'
+        }
+      ).addTo(map)
+
+      var positronLabels = L.tileLayer(
+        'https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png',
+        {
+          attribution: '©OpenStreetMap, ©CartoDB',
+          pane: 'labels'
+        }
+      ).addTo(map)
 
       // Add GeoJson
       geoJson = L.geoJson(euData, {
@@ -70,7 +85,9 @@
           mouseout: resetHighlight,
           click: zoomToFeature
         })
+        layer.bindPopup(features.properties.NAME)
       }
+      
       // Function for hover
       function highlightFeature(e) {
         var layer = e.target
