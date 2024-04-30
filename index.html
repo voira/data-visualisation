@@ -85,9 +85,9 @@
           mouseout: resetHighlight,
           click: zoomToFeature
         })
-        layer.bindPopup(features.properties.NAME)
+        layer.bindPopup('Enter Data Here')
       }
-      
+
       // Function for hover
       function highlightFeature(e) {
         var layer = e.target
@@ -113,9 +113,7 @@
       }
 
       //Create overlay thingy
-      var Paris = L.marker([48.8566, 2.3522]).bindPopup('This is Paris')
-      London = L.marker([51.5074, -0.1278]).bindPopup('This is London')
-      AntwerpenP = L.marker([51.29999, 4.30758]).bindPopup(
+      var AntwerpenP = L.marker([51.29999, 4.30758]).bindPopup(
         'Antwerpen Production'
       )
       WroclavP = L.marker([51.11862, 16.99842]).bindPopup('Wrocłav Productions')
@@ -399,13 +397,16 @@
           // Add more data points as needed
         ])
       })
-      WroclavDC.bindPopup('Wrocłlav Distribution Center').on('click', function () {
-        updateLegendScatterplot([
-          { timeDifference: 2 }, // Sample data point 1
-          { timeDifference: 3 } // Sample data point 2
-          // Add more data points as needed
-        ])
-      })
+      WroclavDC.bindPopup('Wrocłlav Distribution Center').on(
+        'click',
+        function () {
+          updateLegendScatterplot([
+            { timeDifference: 2 }, // Sample data point 1
+            { timeDifference: 3 } // Sample data point 2
+            // Add more data points as needed
+          ])
+        }
+      )
       LyonDC.bindPopup('Lyon Distribution Center').on('click', function () {
         updateLegendScatterplot([
           { timeDifference: 30 }, // Sample data point 1
@@ -413,20 +414,26 @@
           // Add more data points as needed
         ])
       })
-      GoteborgDC.bindPopup('Göteborg Distribution Center').on('click', function () {
-        updateLegendScatterplot([
-          { timeDifference: 22 }, // Sample data point 1
-          { timeDifference: 22 } // Sample data point 2
-          // Add more data points as needed
-        ])
-      })
-      BirminghamDC.bindPopup('Birmingham Distribution Center').on('click', function () {
-        updateLegendScatterplot([
-          { timeDifference: 20 }, // Sample data point 1
-          { timeDifference: 30 } // Sample data point 2
-          // Add more data points as needed
-        ])
-      })
+      GoteborgDC.bindPopup('Göteborg Distribution Center').on(
+        'click',
+        function () {
+          updateLegendScatterplot([
+            { timeDifference: 22 }, // Sample data point 1
+            { timeDifference: 22 } // Sample data point 2
+            // Add more data points as needed
+          ])
+        }
+      )
+      BirminghamDC.bindPopup('Birmingham Distribution Center').on(
+        'click',
+        function () {
+          updateLegendScatterplot([
+            { timeDifference: 20 }, // Sample data point 1
+            { timeDifference: 30 } // Sample data point 2
+            // Add more data points as needed
+          ])
+        }
+      )
     </script>
   </body>
 </html>
