@@ -74,10 +74,39 @@ function zoomToFeature(e) {
     map.fitBounds(e.target.getBounds())
 }
 
+// Color picker function for the map
+
+function getColor(d) {
+    return d === 'Croatia' ||
+        d === 'France' ||
+        d === 'Italy' ||
+        d === 'Portugal' ||
+        d === 'Slovenia' ||
+        d === 'Spain' ||
+        d === 'Switzerland'
+        ? '#99d594'
+        : d === 'Germany' || d === 'Belgium' || d === 'Netherlands'
+            ? '#fc8d59'
+            : d === 'Czech Republic' ||
+                d === 'Greece' ||
+                d === 'Hungary' ||
+                d === 'Poland'
+                ? '#beaed4'
+                : d === 'United Kingdom'
+                    ? '#fbb4ae'
+                    : d === 'Denmark' ||
+                        d === 'Sweden' ||
+                        d === 'Estonia' ||
+                        d === 'Finland' ||
+                        d === 'Latvia' ||
+                        d === 'Lithuania' ||
+                        d === 'Norway'
+                        ? '#91bfdb'
+                        : '#bdbdbd'
+}
+
 //Create overlay thingy
-var Paris = L.marker([48.8566, 2.3522]).bindPopup('This is Paris')
-London = L.marker([51.5074, -0.1278]).bindPopup('This is London')
-AntwerpenP = L.marker([51.29999, 4.30758]).bindPopup(
+var AntwerpenP = L.marker([51.29999, 4.30758]).bindPopup(
     'Antwerpen Production'
 )
 WroclavP = L.marker([51.11862, 16.99842]).bindPopup('Wrocłav Productions')
@@ -111,114 +140,8 @@ var overlayMaps = {
     'Production Plants': Plants
 }
 
+// Add the layer control element to map
 var layerControl = L.control.layers(0, overlayMaps).addTo(map)
-
-// Sample scatterplot data (default)
-var defaultScatterplotData = [
-    { quantity: 100, timeDifference: 10, label: 'Point 1' },
-    { quantity: 200, timeDifference: 20, label: 'Point 2' },
-    { quantity: 300, timeDifference: 15, label: 'Point 3' }
-    // Add more default data points here
-]
-// Set up SVG dimensions
-var margin = { top: 20, right: 20, bottom: 30, left: 40 }
-var width = 600 - margin.left - margin.right
-var height = 400 - margin.top - margin.bottom
-
-// Create SVG element
-var svg = d3
-    .select('#scatterplot')
-    .attr('width', width + margin.left + margin.right)
-    .attr('height', height + margin.top + margin.bottom)
-    .append('g')
-    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-
-// Create scales
-var xScale = d3
-    .scaleLinear()
-    .domain([
-        0,
-        d3.max(defaultScatterplotData, function (d) {
-            return d.quantity
-        })
-    ])
-    .range([0, width])
-
-var yScale = d3
-    .scaleLinear()
-    .domain([
-        0,
-        d3.max(defaultScatterplotData, function (d) {
-            return d.timeDifference
-        })
-    ])
-    .range([height, 0])
-
-// Add dots for default data points
-svg
-    .selectAll('.dot')
-    .data(defaultScatterplotData)
-    .enter()
-    .append('circle')
-    .attr('class', 'dot')
-    .attr('cx', function (d) {
-        return xScale(d.quantity)
-    })
-    .attr('cy', function (d) {
-        return yScale(d.timeDifference)
-    })
-    .attr('r', 5)
-
-// Add axes
-var xAxis = d3.axisBottom(xScale)
-var yAxis = d3.axisLeft(yScale)
-
-svg
-    .append('g')
-    .attr('class', 'x axis')
-    .attr('transform', 'translate(0,' + height + ')')
-    .call(xAxis)
-
-svg.append('g').attr('class', 'y axis').call(yAxis)
-
-// Function to update scatterplot data
-function updateScatterplot(data) {
-    // Remove existing dots
-    svg.selectAll('.dot').remove()
-
-    // Update scales
-    xScale.domain([
-        0,
-        d3.max(data, function (d) {
-            return d.quantity
-        })
-    ])
-    yScale.domain([
-        0,
-        d3.max(data, function (d) {
-            return d.timeDifference
-        })
-    ])
-
-    // Add new dots for updated data
-    svg
-        .selectAll('.dot')
-        .data(data)
-        .enter()
-        .append('circle')
-        .attr('class', 'dot')
-        .attr('cx', function (d) {
-            return xScale(d.quantity)
-        })
-        .attr('cy', function (d) {
-            return yScale(d.timeDifference)
-        })
-        .attr('r', 5)
-
-    // Update axes
-    svg.select('.x.axis').call(xAxis)
-    svg.select('.y.axis').call(yAxis)
-}
 
 //Scatterplot to SVG file
 var svgElement = document.getElementById('scatterplot')
@@ -275,37 +198,6 @@ legendControl.addTo(map)
 var style = document.createElement('style')
 style.innerHTML = customStyles
 document.head.appendChild(style)
-
-// Color picker function for the map
-
-function getColor(d) {
-    return d === 'Croatia' ||
-        d === 'France' ||
-        d === 'Italy' ||
-        d === 'Portugal' ||
-        d === 'Slovenia' ||
-        d === 'Spain' ||
-        d === 'Switzerland'
-        ? '#99d594'
-        : d === 'Germany' || d === 'Belgium' || d === 'Netherlands'
-            ? '#fc8d59'
-            : d === 'Czech Republic' ||
-                d === 'Greece' ||
-                d === 'Hungary' ||
-                d === 'Poland'
-                ? '#beaed4'
-                : d === 'United Kingdom'
-                    ? '#fbb4ae'
-                    : d === 'Denmark' ||
-                        d === 'Sweden' ||
-                        d === 'Estonia' ||
-                        d === 'Finland' ||
-                        d === 'Latvia' ||
-                        d === 'Lithuania' ||
-                        d === 'Norway'
-                        ? '#91bfdb'
-                        : '#bdbdbd'
-}
 
 // Function to update the scatterplot in the legend
 function updateLegendScatterplot(data) {
