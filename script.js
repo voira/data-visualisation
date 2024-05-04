@@ -313,22 +313,40 @@ function updateLegendScatterplot(data) {
 
     // Remove existing scatterplot points
     legendSvg.querySelectorAll('circle').forEach(function (circle) {
-        circle.remove()
+      circle.remove()
     })
 
     // Add new scatterplot points based on the provided data
     data.forEach(function (d, i) {
-        var circle = document.createElementNS(
-            'http://www.w3.org/2000/svg',
-            'circle'
-        )
-        circle.setAttribute('cx', 50 + i * 50) // Adjust x-coordinate based on index
-        circle.setAttribute('cy', 50 - d.timeDifference) // Adjust y-coordinate based on data
-        circle.setAttribute('r', 5)
-        circle.setAttribute('fill', 'steelblue')
-        legendSvg.appendChild(circle)
+      var circle = document.createElementNS(
+        'http://www.w3.org/2000/svg',
+        'circle'
+      )
+      circle.setAttribute('cx', 50 + i * 50) // Adjust x-coordinate based on index
+      circle.setAttribute('cy', 50 - d.timeDifference) // Adjust y-coordinate based on data
+      circle.setAttribute('r', 5)
+      circle.setAttribute('fill', 'steelblue')
+      circle.classList.add('legend-dot') // Add class to identify the dots
+      legendSvg.appendChild(circle)
     })
-}
+
+    // Attach click event listeners to the blue dots
+    legendSvg.querySelectorAll('.legend-dot').forEach(function (dot) {
+      dot.addEventListener('click', function (event) {
+        // Prevent click event propagation
+        event.stopPropagation()
+        // Display a message when the blue dot is clicked
+        alert('Hey you clicked me!')
+      })
+    })
+  }
+
+  // Attach click event listener to legend SVG to prevent propagation
+  document
+    .querySelector('.legend-svg')
+    .addEventListener('click', function (event) {
+      event.stopPropagation()
+    })
 
 // Attach event listeners to marker popups to update legend scatterplot
 AntwerpenP.bindPopup('Antwerpen Production').on('click', function () {
