@@ -199,6 +199,123 @@ var style = document.createElement('style')
 style.innerHTML = customStyles
 document.head.appendChild(style)
 
+// Create a variable to hold the reference to the legend container
+var legendContainer = document.querySelector('.legend');
+// Create a variable to hold the reference to the pie chart container
+var pieChartContainer = null;
+
+// Update the generatePieChart function to accept distribution data
+function generatePieChart(distribution) {
+    // Define SVG attributes
+    var svg = '<svg width="100" height="100">';
+    // Draw pie slices based on distribution data
+    if (distribution) {
+        var colors = ['blue', 'green', 'red']; // Define colors for different distributions
+        var sum = distribution.reduce((a, b) => a + b, 0); // Calculate total for normalization
+        var startAngle = 0;
+        distribution.forEach(function (value, i) {
+            var sliceAngle = (value / sum) * 360; // Calculate slice angle
+            svg += '<path fill="' + colors[i] + '" d="' + describeArc(50, 50, 50, startAngle, startAngle + sliceAngle) + '"></path>';
+            startAngle += sliceAngle; // Update start angle for next slice
+        });
+    }
+    svg += '</svg>';
+    return svg;
+}
+
+// Attach event listener to legend SVG to prevent propagation
+document
+    .querySelector('.legend-svg')
+    .addEventListener('click', function (event) {
+      event.stopPropagation()
+    })
+
+// Attach event listeners to marker popups to update legend scatterplot
+AntwerpenP.bindPopup('Antwerpen Production').on('click', function () {
+    updateLegendScatterplot([
+        { timeDifference: 20, distribution: [50, 50]  }, // Sample data point 1
+        { timeDifference: 40, distribution: [30, 20, 50] } // Sample data point 2
+        // Add more data points as needed
+    ])
+})
+
+WroclavP.bindPopup('Wrocłav Productions').on('click', function () {
+    updateLegendScatterplot([
+        { timeDifference: 30, distribution: [50, 50]  }, // Sample data point 1
+        { timeDifference: 50, distribution: [30, 20, 50] } // Sample data point 2
+        // Add more data points as needed
+    ])
+})
+
+LyonP.bindPopup('Lyon Productions').on('click', function () {
+    updateLegendScatterplot([
+        { timeDifference: 40, distribution: [50, 50]  }, // Sample data point 1
+        { timeDifference: 60, distribution: [30, 20, 50] } // Sample data point 2
+        // Add more data points as needed
+    ])
+})
+AntwerpenDC.bindPopup('Antwerpen Distribution').on('click', function () {
+    updateLegendScatterplot([
+        { timeDifference: 30, distribution: [50, 50] }, // Distribution data for point 1
+        { timeDifference: 5, distribution: [30, 20, 50] } // Distribution data for point 2
+        // Add more data points as needed
+    ]);
+});
+WroclavDC.bindPopup('Wrocłlav Distribution Center').on('click', function () {
+    updateLegendScatterplot([
+        { timeDifference: 2, distribution: [50, 50]  }, // Sample data point 1
+        { timeDifference: 3, distribution: [30, 20, 50] } // Sample data point 2
+        // Add more data points as needed
+    ])
+})
+LyonDC.bindPopup('Lyon Distribution Center').on('click', function () {
+    updateLegendScatterplot([
+        { timeDifference: 30, distribution: [50, 50]  }, // Sample data point 1
+        { timeDifference: 65, distribution: [30, 20, 50] } // Sample data point 2
+        // Add more data points as needed
+    ])
+})
+GoteborgDC.bindPopup('Göteborg Distribution Center').on('click', function () {
+    updateLegendScatterplot([
+        { timeDifference: 22, distribution: [50, 50]  }, // Sample data point 1
+        { timeDifference: 22, distribution: [30, 20, 50] } // Sample data point 2
+        // Add more data points as needed
+    ])
+})
+BirminghamDC.bindPopup('Birmingham Distribution Center').on('click', function () {
+    updateLegendScatterplot([
+        { timeDifference: 20, distribution: [50, 50]  }, // Sample data point 1
+        { timeDifference: 30, distribution: [30, 20, 50] } // Sample data point 2
+        // Add more data points as needed
+    ])
+})
+
+function describeArc(x, y, radius, startAngle, endAngle){
+    var start = polarToCartesian(x, y, radius, endAngle);
+    var end = polarToCartesian(x, y, radius, startAngle);
+
+    var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+
+    // Instead of using the radius, use the center point as reference
+    var d = [
+        "M", x, y, 
+        "L", start.x, start.y,
+        "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
+        "Z" // Close the path to fill the entire circle
+    ].join(" ");
+
+    return d;       
+}
+
+function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+    var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
+  
+    return {
+        x: centerX + (radius * Math.cos(angleInRadians)),
+        y: centerY + (radius * Math.sin(angleInRadians))
+    };
+}
+
 // Function to update the scatterplot in the legend
 function updateLegendScatterplot(data) {
     var legendSvg = document.querySelector('.legend-svg')
@@ -220,82 +337,31 @@ function updateLegendScatterplot(data) {
       circle.setAttribute('fill', 'steelblue')
       circle.classList.add('legend-dot') // Add class to identify the dots
       legendSvg.appendChild(circle)
+      
+      // Add event listener to update pie chart when the scatterplot point is clicked
+      circle.addEventListener('click', function () {
+          // Update the pie chart with distribution data
+          updatePieChartDistribution(d.distribution);
+      });
     })
 
-    // Attach click event listeners to the blue dots
-    legendSvg.querySelectorAll('.legend-dot').forEach(function (dot) {
-      dot.addEventListener('click', function (event) {
-        // Prevent click event propagation
-        event.stopPropagation()
-        // Display a message when the blue dot is clicked
-        alert('Hey you clicked me!')
-      })
-    })
-  }
+    // If pieChartContainer doesn't exist, create it
+    if (!pieChartContainer) {
+        pieChartContainer = document.createElement('div');
+        pieChartContainer.className = 'pie-chart-container';
+        legendContainer.parentNode.insertBefore(pieChartContainer, legendContainer);
+    }
 
-  // Attach click event listener to legend SVG to prevent propagation
-  document
-    .querySelector('.legend-svg')
-    .addEventListener('click', function (event) {
-      event.stopPropagation()
-    })
+    // Generate pie chart SVG
+    var pieChart = generatePieChart();
+    // Update the content of the pie chart container with the new pie chart SVG
+    pieChartContainer.innerHTML = '<h4>Contributions from transportation stages</h4>' + pieChart;
+}
 
-// Attach event listeners to marker popups to update legend scatterplot
-AntwerpenP.bindPopup('Antwerpen Production').on('click', function () {
-    updateLegendScatterplot([
-        { timeDifference: 20 }, // Sample data point 1
-        { timeDifference: 40 } // Sample data point 2
-        // Add more data points as needed
-    ])
-})
-
-WroclavP.bindPopup('Wrocłav Productions').on('click', function () {
-    updateLegendScatterplot([
-        { timeDifference: 30 }, // Sample data point 1
-        { timeDifference: 50 } // Sample data point 2
-        // Add more data points as needed
-    ])
-})
-
-LyonP.bindPopup('Lyon Productions').on('click', function () {
-    updateLegendScatterplot([
-        { timeDifference: 40 }, // Sample data point 1
-        { timeDifference: 60 } // Sample data point 2
-        // Add more data points as needed
-    ])
-})
-AntwerpenDC.bindPopup('Antwerpen Distribution').on('click', function () {
-    updateLegendScatterplot([
-        { timeDifference: 30 }, // Sample data point 1
-        { timeDifference: 5 } // Sample data point 2
-        // Add more data points as needed
-    ])
-})
-WroclavDC.bindPopup('Wrocłlav Distribution Center').on('click', function () {
-    updateLegendScatterplot([
-        { timeDifference: 2 }, // Sample data point 1
-        { timeDifference: 3 } // Sample data point 2
-        // Add more data points as needed
-    ])
-})
-LyonDC.bindPopup('Lyon Distribution Center').on('click', function () {
-    updateLegendScatterplot([
-        { timeDifference: 30 }, // Sample data point 1
-        { timeDifference: 65 } // Sample data point 2
-        // Add more data points as needed
-    ])
-})
-GoteborgDC.bindPopup('Göteborg Distribution Center').on('click', function () {
-    updateLegendScatterplot([
-        { timeDifference: 22 }, // Sample data point 1
-        { timeDifference: 22 } // Sample data point 2
-        // Add more data points as needed
-    ])
-})
-BirminghamDC.bindPopup('Birmingham Distribution Center').on('click', function () {
-    updateLegendScatterplot([
-        { timeDifference: 20 }, // Sample data point 1
-        { timeDifference: 30 } // Sample data point 2
-        // Add more data points as needed
-    ])
-})
+// Function to update the pie chart with distribution data
+function updatePieChartDistribution(distribution) {
+    // Generate pie chart SVG with distribution data
+    var pieChart = generatePieChart(distribution);
+    // Update the content of the pie chart container with the new pie chart SVG
+    pieChartContainer.innerHTML = '<h4>Contributions from transportation stages</h4>' + pieChart;
+}
