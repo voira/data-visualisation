@@ -22,9 +22,9 @@ var positronLabels = L.tileLayer(
 
 // Add the GeoJSON
 var geoJson = L.geoJson(euData, {
-    style: style,
-    onEachFeature: onEachFeature
-  }).addTo(map)
+  style: style,
+  onEachFeature: onEachFeature
+}).addTo(map)
 
 // Function for color
 function style(features) {
@@ -284,23 +284,23 @@ function getColor(d) {
     d === 'Switzerland'
     ? '#99d594'
     : d === 'Germany' || d === 'Belgium' || d === 'Netherlands'
-    ? '#fc8d59'
-    : d === 'Czech Republic' ||
-      d === 'Greece' ||
-      d === 'Hungary' ||
-      d === 'Poland'
-    ? '#beaed4'
-    : d === 'United Kingdom'
-    ? '#fbb4ae'
-    : d === 'Denmark' ||
-      d === 'Sweden' ||
-      d === 'Estonia' ||
-      d === 'Finland' ||
-      d === 'Latvia' ||
-      d === 'Lithuania' ||
-      d === 'Norway'
-    ? '#91bfdb'
-    : '#bdbdbd'
+      ? '#fc8d59'
+      : d === 'Czech Republic' ||
+        d === 'Greece' ||
+        d === 'Hungary' ||
+        d === 'Poland'
+        ? '#beaed4'
+        : d === 'United Kingdom'
+          ? '#fbb4ae'
+          : d === 'Denmark' ||
+            d === 'Sweden' ||
+            d === 'Estonia' ||
+            d === 'Finland' ||
+            d === 'Latvia' ||
+            d === 'Lithuania' ||
+            d === 'Norway'
+            ? '#91bfdb'
+            : '#bdbdbd'
 }
 
 // Function to update the scatterplot in the legend
