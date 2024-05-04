@@ -75,7 +75,6 @@ function zoomToFeature(e) {
 }
 
 // Color picker function for the map
-
 function getColor(d) {
     return d === 'Croatia' ||
         d === 'France' ||
@@ -105,7 +104,7 @@ function getColor(d) {
                         : '#bdbdbd'
 }
 
-//Create overlay thingy
+// Create overlay thingy
 var AntwerpenP = L.marker([51.29999, 4.30758]).bindPopup(
     'Antwerpen Production'
 )
@@ -143,7 +142,7 @@ var overlayMaps = {
 // Add the layer control element to map
 var layerControl = L.control.layers(0, overlayMaps).addTo(map)
 
-//Scatterplot to SVG file
+// Scatterplot to SVG file
 var svgElement = document.getElementById('scatterplot')
 
 var legendContent = `
@@ -233,7 +232,7 @@ document
 // Attach event listeners to marker popups to update legend scatterplot
 AntwerpenP.bindPopup('Antwerpen Production').on('click', function () {
     updateLegendScatterplot([
-        { timeDifference: 20, distribution: [50, 50]  }, // Sample data point 1
+        { timeDifference: 20, distribution: [50, 50, 0]  }, // Sample data point 1
         { timeDifference: 40, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
@@ -241,7 +240,7 @@ AntwerpenP.bindPopup('Antwerpen Production').on('click', function () {
 
 WroclavP.bindPopup('Wrocłav Productions').on('click', function () {
     updateLegendScatterplot([
-        { timeDifference: 30, distribution: [50, 50]  }, // Sample data point 1
+        { timeDifference: 30, distribution: [50, 50, 0]  }, // Sample data point 1
         { timeDifference: 50, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
@@ -249,42 +248,42 @@ WroclavP.bindPopup('Wrocłav Productions').on('click', function () {
 
 LyonP.bindPopup('Lyon Productions').on('click', function () {
     updateLegendScatterplot([
-        { timeDifference: 40, distribution: [50, 50]  }, // Sample data point 1
+        { timeDifference: 40, distribution: [50, 50, 0]  }, // Sample data point 1
         { timeDifference: 60, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
 })
 AntwerpenDC.bindPopup('Antwerpen Distribution').on('click', function () {
     updateLegendScatterplot([
-        { timeDifference: 30, distribution: [50, 50] }, // Distribution data for point 1
+        { timeDifference: 30, distribution: [50, 50, 0] }, // Distribution data for point 1
         { timeDifference: 5, distribution: [30, 20, 50] } // Distribution data for point 2
         // Add more data points as needed
     ]);
 });
 WroclavDC.bindPopup('Wrocłlav Distribution Center').on('click', function () {
     updateLegendScatterplot([
-        { timeDifference: 2, distribution: [50, 50]  }, // Sample data point 1
+        { timeDifference: 2, distribution: [50, 50, 0]  }, // Sample data point 1
         { timeDifference: 3, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
 })
 LyonDC.bindPopup('Lyon Distribution Center').on('click', function () {
     updateLegendScatterplot([
-        { timeDifference: 30, distribution: [50, 50]  }, // Sample data point 1
+        { timeDifference: 30, distribution: [50, 50, 0]  }, // Sample data point 1
         { timeDifference: 65, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
 })
 GoteborgDC.bindPopup('Göteborg Distribution Center').on('click', function () {
     updateLegendScatterplot([
-        { timeDifference: 22, distribution: [50, 50]  }, // Sample data point 1
+        { timeDifference: 22, distribution: [50, 50, 0]  }, // Sample data point 1
         { timeDifference: 22, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
 })
 BirminghamDC.bindPopup('Birmingham Distribution Center').on('click', function () {
     updateLegendScatterplot([
-        { timeDifference: 20, distribution: [50, 50]  }, // Sample data point 1
+        { timeDifference: 20, distribution: [50, 50, 0]  }, // Sample data point 1
         { timeDifference: 30, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
@@ -362,6 +361,78 @@ function updateLegendScatterplot(data) {
 function updatePieChartDistribution(distribution) {
     // Generate pie chart SVG with distribution data
     var pieChart = generatePieChart(distribution);
-    // Update the content of the pie chart container with the new pie chart SVG
-    pieChartContainer.innerHTML = '<h4>Contributions from transportation stages</h4>' + pieChart;
+    
+    // Generate pie chart legend HTML dynamically based on distribution values
+    var pieLegend = '<div class="pie-legend"><h4>Contributions</h4>';
+    distribution.forEach(function (value, index) {
+        var color;
+        switch (index) {
+            case 0:
+                color = 'blue';
+                break;
+            case 1:
+                color = 'green';
+                break;
+            case 2:
+                color = 'red';
+                break;
+            default:
+                color = 'black';
+        }
+        pieLegend += '<div><span style="display: inline-block; width: 10px; height: 10px; background-color: ' + color + ';"></span><span>';
+        switch (index) {
+            case 0:
+                pieLegend += 'Grass';
+                break;
+            case 1:
+                pieLegend += 'Water';
+                break;
+            case 2:
+                pieLegend += 'Fire';
+                break;
+            default:
+                pieLegend += 'Unknown';
+        }
+        pieLegend += ' - ' + value + '%</span></div>';
+    });
+    pieLegend += '</div>';
+    
+    // Create containers for the pie chart and legend
+    var pieContainer = document.createElement('div');
+    pieContainer.className = 'legend-container'; // Use the same class for consistency with the scatterplot legend container
+    
+    // Add the pie chart SVG to the pie container
+    pieContainer.innerHTML = '<h4>Contributions from transportation stages</h4>' + pieChart;
+    
+    // Inject custom styles into the document specifically for the pie chart legend container
+    var style = document.createElement('style');
+    style.innerHTML = `
+        .pie-chart-legend-container {
+            margin-left: 20px; /* Adjust this value as needed */
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Check if the pieLegendContainer already exists
+    var pieLegendContainer = document.querySelector('.pie-chart-legend-container');
+    if (!pieLegendContainer) {
+        pieLegendContainer = document.createElement('div');
+        pieLegendContainer.className = 'pie-chart-legend-container';
+    }
+    
+    // Add the pie legend HTML to the pie legend container
+    pieLegendContainer.innerHTML = pieLegend;
+    
+    // Append the pie legend container to the pie chart container
+    pieContainer.appendChild(pieLegendContainer);
+
+    // If pieChartContainer doesn't exist, create it
+    if (!pieChartContainer) {
+        pieChartContainer = document.createElement('div');
+        pieChartContainer.className = 'pie-chart-container';
+        legendContainer.parentNode.insertBefore(pieChartContainer, legendContainer);
+    }
+
+    // Update the content of the pie chart container with the new pie chart SVG and legend
+    pieChartContainer.innerHTML = pieContainer.innerHTML;
 }
