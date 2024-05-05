@@ -4,7 +4,11 @@ map.createPane('labels')
 map.getPane('labels').style.zIndex = 650
 map.getPane('labels').style.pointerEvents = 'none'
 
-var geoJson
+// Add GeoJson
+var geoJson = L.geoJson(euData, {
+    style: style,
+    onEachFeature: onEachFeature
+}).addTo(map)
 
 // Add tile layer
 L.tileLayer(
@@ -21,12 +25,6 @@ var positronLabels = L.tileLayer(
         pane: 'labels'
     }
 ).addTo(map)
-
-// Add GeoJson
-geoJson = L.geoJson(euData, {
-    style: style,
-    onEachFeature: onEachFeature
-}).addTo(map)
 
 // Function for color
 function style(features) {
@@ -104,7 +102,7 @@ function getColor(d) {
                         : '#bdbdbd'
 }
 
-// Create overlay thingy
+// Create toggle overlay
 var AntwerpenP = L.marker([51.29999, 4.30758]).bindPopup(
     'Antwerpen Production'
 )
@@ -226,13 +224,13 @@ function generatePieChart(distribution) {
 document
     .querySelector('.legend-svg')
     .addEventListener('click', function (event) {
-      event.stopPropagation()
+        event.stopPropagation()
     })
 
 // Attach event listeners to marker popups to update legend scatterplot
 AntwerpenP.bindPopup('Antwerpen Production').on('click', function () {
     updateLegendScatterplot([
-        { timeDifference: 20, distribution: [50, 50, 0]  }, // Sample data point 1
+        { timeDifference: 20, distribution: [50, 50, 0] }, // Sample data point 1
         { timeDifference: 40, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
@@ -240,7 +238,7 @@ AntwerpenP.bindPopup('Antwerpen Production').on('click', function () {
 
 WroclavP.bindPopup('Wrocłav Productions').on('click', function () {
     updateLegendScatterplot([
-        { timeDifference: 30, distribution: [50, 50, 0]  }, // Sample data point 1
+        { timeDifference: 30, distribution: [50, 50, 0] }, // Sample data point 1
         { timeDifference: 50, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
@@ -248,7 +246,7 @@ WroclavP.bindPopup('Wrocłav Productions').on('click', function () {
 
 LyonP.bindPopup('Lyon Productions').on('click', function () {
     updateLegendScatterplot([
-        { timeDifference: 40, distribution: [50, 50, 0]  }, // Sample data point 1
+        { timeDifference: 40, distribution: [50, 50, 0] }, // Sample data point 1
         { timeDifference: 60, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
@@ -262,34 +260,34 @@ AntwerpenDC.bindPopup('Antwerpen Distribution').on('click', function () {
 });
 WroclavDC.bindPopup('Wrocłlav Distribution Center').on('click', function () {
     updateLegendScatterplot([
-        { timeDifference: 2, distribution: [50, 50, 0]  }, // Sample data point 1
+        { timeDifference: 2, distribution: [50, 50, 0] }, // Sample data point 1
         { timeDifference: 3, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
 })
 LyonDC.bindPopup('Lyon Distribution Center').on('click', function () {
     updateLegendScatterplot([
-        { timeDifference: 30, distribution: [50, 50, 0]  }, // Sample data point 1
+        { timeDifference: 30, distribution: [50, 50, 0] }, // Sample data point 1
         { timeDifference: 65, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
 })
 GoteborgDC.bindPopup('Göteborg Distribution Center').on('click', function () {
     updateLegendScatterplot([
-        { timeDifference: 22, distribution: [50, 50, 0]  }, // Sample data point 1
+        { timeDifference: 22, distribution: [50, 50, 0] }, // Sample data point 1
         { timeDifference: 22, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
 })
 BirminghamDC.bindPopup('Birmingham Distribution Center').on('click', function () {
     updateLegendScatterplot([
-        { timeDifference: 20, distribution: [50, 50, 0]  }, // Sample data point 1
+        { timeDifference: 20, distribution: [50, 50, 0] }, // Sample data point 1
         { timeDifference: 30, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
 })
 
-function describeArc(x, y, radius, startAngle, endAngle){
+function describeArc(x, y, radius, startAngle, endAngle) {
     var start = polarToCartesian(x, y, radius, endAngle);
     var end = polarToCartesian(x, y, radius, startAngle);
 
@@ -297,18 +295,18 @@ function describeArc(x, y, radius, startAngle, endAngle){
 
     // Instead of using the radius, use the center point as reference
     var d = [
-        "M", x, y, 
+        "M", x, y,
         "L", start.x, start.y,
         "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
         "Z" // Close the path to fill the entire circle
     ].join(" ");
 
-    return d;       
+    return d;
 }
 
 function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
     var angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
-  
+
     return {
         x: centerX + (radius * Math.cos(angleInRadians)),
         y: centerY + (radius * Math.sin(angleInRadians))
@@ -321,27 +319,27 @@ function updateLegendScatterplot(data) {
 
     // Remove existing scatterplot points
     legendSvg.querySelectorAll('circle').forEach(function (circle) {
-      circle.remove()
+        circle.remove()
     })
 
     // Add new scatterplot points based on the provided data
     data.forEach(function (d, i) {
-      var circle = document.createElementNS(
-        'http://www.w3.org/2000/svg',
-        'circle'
-      )
-      circle.setAttribute('cx', 50 + i * 50) // Adjust x-coordinate based on index
-      circle.setAttribute('cy', 50 - d.timeDifference) // Adjust y-coordinate based on data
-      circle.setAttribute('r', 5)
-      circle.setAttribute('fill', 'steelblue')
-      circle.classList.add('legend-dot') // Add class to identify the dots
-      legendSvg.appendChild(circle)
-      
-      // Add event listener to update pie chart when the scatterplot point is clicked
-      circle.addEventListener('click', function () {
-          // Update the pie chart with distribution data
-          updatePieChartDistribution(d.distribution);
-      });
+        var circle = document.createElementNS(
+            'http://www.w3.org/2000/svg',
+            'circle'
+        )
+        circle.setAttribute('cx', 50 + i * 50) // Adjust x-coordinate based on index
+        circle.setAttribute('cy', 50 - d.timeDifference) // Adjust y-coordinate based on data
+        circle.setAttribute('r', 5)
+        circle.setAttribute('fill', 'steelblue')
+        circle.classList.add('legend-dot') // Add class to identify the dots
+        legendSvg.appendChild(circle)
+
+        // Add event listener to update pie chart when the scatterplot point is clicked
+        circle.addEventListener('click', function () {
+            // Update the pie chart with distribution data
+            updatePieChartDistribution(d.distribution);
+        });
     })
 
     // If pieChartContainer doesn't exist, create it
@@ -361,7 +359,7 @@ function updateLegendScatterplot(data) {
 function updatePieChartDistribution(distribution) {
     // Generate pie chart SVG with distribution data
     var pieChart = generatePieChart(distribution);
-    
+
     // Generate pie chart legend HTML dynamically based on distribution values
     var pieLegend = '<div class="pie-legend"><h4>Contributions</h4>';
     distribution.forEach(function (value, index) {
@@ -396,14 +394,14 @@ function updatePieChartDistribution(distribution) {
         pieLegend += ' - ' + value + '%</span></div>';
     });
     pieLegend += '</div>';
-    
+
     // Create containers for the pie chart and legend
     var pieContainer = document.createElement('div');
     pieContainer.className = 'legend-container'; // Use the same class for consistency with the scatterplot legend container
-    
+
     // Add the pie chart SVG to the pie container
     pieContainer.innerHTML = '<h4>Contributions from transportation stages</h4>' + pieChart;
-    
+
     // Inject custom styles into the document specifically for the pie chart legend container
     var style = document.createElement('style');
     style.innerHTML = `
@@ -412,17 +410,17 @@ function updatePieChartDistribution(distribution) {
         }
     `;
     document.head.appendChild(style);
-    
+
     // Check if the pieLegendContainer already exists
     var pieLegendContainer = document.querySelector('.pie-chart-legend-container');
     if (!pieLegendContainer) {
         pieLegendContainer = document.createElement('div');
         pieLegendContainer.className = 'pie-chart-legend-container';
     }
-    
+
     // Add the pie legend HTML to the pie legend container
     pieLegendContainer.innerHTML = pieLegend;
-    
+
     // Append the pie legend container to the pie chart container
     pieContainer.appendChild(pieLegendContainer);
 
