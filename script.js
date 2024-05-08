@@ -234,6 +234,11 @@ AntwerpenP.bindPopup('Antwerpen Production').on('click', function () {
         { timeDifference: 40, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
+    updateLineChart([
+        { value: 20 }, // Sample data point 1
+        { value: 40 } // Sample data point 2
+        // Add more data points as needed
+    ]);
 })
 
 WroclavP.bindPopup('Wrocłav Productions').on('click', function () {
@@ -242,6 +247,11 @@ WroclavP.bindPopup('Wrocłav Productions').on('click', function () {
         { timeDifference: 50, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
+    updateLineChart([
+        { value: 20 }, // Sample data point 1
+        { value: 60 } // Sample data point 2
+        // Add more data points as needed
+    ]);
 })
 
 LyonP.bindPopup('Lyon Productions').on('click', function () {
@@ -250,11 +260,21 @@ LyonP.bindPopup('Lyon Productions').on('click', function () {
         { timeDifference: 60, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
+    updateLineChart([
+        { value: 10 }, // Sample data point 1
+        { value: 20 } // Sample data point 2
+        // Add more data points as needed
+    ]);
 })
 AntwerpenDC.bindPopup('Antwerpen Distribution').on('click', function () {
     updateLegendScatterplot([
         { timeDifference: 30, distribution: [50, 50, 0] }, // Distribution data for point 1
         { timeDifference: 5, distribution: [30, 20, 50] } // Distribution data for point 2
+        // Add more data points as needed
+    ]);
+    updateLineChart([
+        { value: 40 }, // Sample data point 1
+        { value: 80 } // Sample data point 2
         // Add more data points as needed
     ]);
 });
@@ -264,6 +284,11 @@ WroclavDC.bindPopup('Wrocłlav Distribution Center').on('click', function () {
         { timeDifference: 3, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
+    updateLineChart([
+        { value: 70 }, // Sample data point 1
+        { value: 80 } // Sample data point 2
+        // Add more data points as needed
+    ]);
 })
 LyonDC.bindPopup('Lyon Distribution Center').on('click', function () {
     updateLegendScatterplot([
@@ -271,6 +296,11 @@ LyonDC.bindPopup('Lyon Distribution Center').on('click', function () {
         { timeDifference: 65, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
+    updateLineChart([
+        { value: 20 }, // Sample data point 1
+        { value: 40 } // Sample data point 2
+        // Add more data points as needed
+    ]);
 })
 GoteborgDC.bindPopup('Göteborg Distribution Center').on('click', function () {
     updateLegendScatterplot([
@@ -278,6 +308,11 @@ GoteborgDC.bindPopup('Göteborg Distribution Center').on('click', function () {
         { timeDifference: 22, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
+    updateLineChart([
+        { value: 40 }, // Sample data point 1
+        { value: 70 } // Sample data point 2
+        // Add more data points as needed
+    ]);
 })
 BirminghamDC.bindPopup('Birmingham Distribution Center').on('click', function () {
     updateLegendScatterplot([
@@ -285,6 +320,11 @@ BirminghamDC.bindPopup('Birmingham Distribution Center').on('click', function ()
         { timeDifference: 30, distribution: [30, 20, 50] } // Sample data point 2
         // Add more data points as needed
     ])
+    updateLineChart([
+        { value: 10 }, // Sample data point 1
+        { value: 10 } // Sample data point 2
+        // Add more data points as needed
+    ]);
 })
 
 function describeArc(x, y, radius, startAngle, endAngle) {
@@ -433,4 +473,100 @@ function updatePieChartDistribution(distribution) {
 
     // Update the content of the pie chart container with the new pie chart SVG and legend
     pieChartContainer.innerHTML = pieContainer.innerHTML;
+}
+
+//Add second legend
+
+// Create a custom legend control for the line chart on the left
+var lineChartLegendControl = L.control({ position: 'bottomleft' });
+
+lineChartLegendControl.onAdd = function (map) {
+    var div = L.DomUtil.create('div', 'legend-container');
+    // Here you can add SVG elements to draw the line chart
+    var svgContent = `
+        <div class="line-chart-legend">
+            <svg class="line-chart-svg" width="200" height="100">
+                <!-- Background color -->
+                <rect x="0" y="0" width="200" height="100" fill="white" stroke="black" stroke-width="1" />
+                <!-- X-axis -->
+                <line x1="20" y1="80" x2="180" y2="80" stroke="black" stroke-width="1" />
+                <text x="30" y="95">0</text>
+                <text x="70" y="95">50</text>
+                <text x="110" y="95">100</text>
+                <text x="150" y="95">150</text>
+                <!-- Y-axis -->
+                <line x1="20" y1="80" x2="20" y2="10" stroke="black" stroke-width="1" />
+                <text x="3" y="80">0</text>
+                <text x="3" y="60">20</text>
+                <text x="3" y="40">40</text>
+                <text x="3" y="20">60</text>
+            </svg>
+        </div>
+    `;
+    div.innerHTML = svgContent;
+    return div;
+};
+
+// Add the line chart legend control to the map
+lineChartLegendControl.addTo(map);
+
+// Define custom CSS styles for the line chart legend
+var lineChartLegendStyles = `
+    .line-chart-legend {
+        background-color: white;
+        border: 1px solid black;
+        padding: 10px;
+    }
+`;
+
+// Inject custom styles into the document
+var style = document.createElement('style');
+style.innerHTML = lineChartLegendStyles;
+document.head.appendChild(style);
+
+// Function to generate the line chart SVG based on the data
+function generateLineChart(data) {
+    // Define SVG attributes for the line chart
+    var svg = '<svg class="line-chart-svg" width="200" height="100">';
+    // Draw the background color
+    svg += '<rect x="0" y="0" width="200" height="100" fill="white" stroke="black" stroke-width="1" />';
+    // Draw the axes
+    svg += '<line x1="20" y1="80" x2="180" y2="80" stroke="black" stroke-width="1" />';
+    svg += '<text x="30" y="95">0</text>';
+    svg += '<text x="70" y="95">50</text>';
+    svg += '<text x="110" y="95">100</text>';
+    svg += '<text x="150" y="95">150</text>';
+    svg += '<line x1="20" y1="80" x2="20" y2="10" stroke="black" stroke-width="1" />';
+    svg += '<text x="3" y="80">0</text>';
+    svg += '<text x="3" y="60">20</text>';
+    svg += '<text x="3" y="40">40</text>';
+    svg += '<text x="3" y="20">60</text>';
+    // Draw the line and circles based on the data
+    if (data) {
+        // Draw lines connecting the data points
+        svg += '<polyline points="';
+        data.forEach(function (point, i) {
+            svg += (20 + i * 40) + ',' + (80 - point.value * 0.4) + ' '; // Adjust coordinates based on data
+        });
+        svg += '" fill="none" stroke="blue" stroke-width="2" />';
+        // Draw circles at each data point
+        data.forEach(function (point, i) {
+            svg += '<circle cx="' + (20 + i * 40) + '" cy="' + (80 - point.value * 0.4) + '" r="3" fill="blue" />';
+        });
+    }
+    svg += '</svg>';
+    return svg;
+}
+// Function to update the line chart with new data
+function updateLineChart(data) {
+    var lineChartSvg = document.querySelector('.line-chart-svg');
+
+    // Remove existing line chart elements
+    lineChartSvg.innerHTML = '';
+
+    // Generate the line chart SVG with the new data
+    var lineChart = generateLineChart(data);
+
+    // Update the content of the line chart SVG
+    lineChartSvg.innerHTML = lineChart;
 }
