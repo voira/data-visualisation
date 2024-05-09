@@ -1,10 +1,11 @@
 // Initialize map
-var map = L.map('map').setView([51.505, -0.09], 4)
+var map = L.map('map', {
+    scrollWheelZoom: false
+}).setView([51.505, 10], 4.5)
+
 map.createPane('labels')
 map.getPane('labels').style.zIndex = 650
 map.getPane('labels').style.pointerEvents = 'none'
-
-var geoJson
 
 // Add tile layer
 L.tileLayer(
@@ -23,7 +24,7 @@ var positronLabels = L.tileLayer(
 ).addTo(map)
 
 // Add GeoJson
-geoJson = L.geoJson(euData, {
+var geoJson = L.geoJson(euData, {
     style: style,
     onEachFeature: onEachFeature
 }).addTo(map)
@@ -36,7 +37,7 @@ function style(features) {
         opacity: 1,
         color: 'white',
         dashArray: '1',
-        fillOpacity: 0.5
+        fillOpacity: 0.35
     }
 }
 
@@ -47,7 +48,6 @@ function onEachFeature(features, layer) {
         mouseout: resetHighlight,
         click: zoomToFeature
     })
-    layer.bindPopup(features.properties.NAME)
 }
 
 // Function for hover
@@ -83,16 +83,16 @@ function getColor(d) {
         d === 'Slovenia' ||
         d === 'Spain' ||
         d === 'Switzerland'
-        ? '#99d594'
+        ? '#34a853'
         : d === 'Germany' || d === 'Belgium' || d === 'Netherlands'
-            ? '#fc8d59'
+            ? '#f18d00'
             : d === 'Czech Republic' ||
                 d === 'Greece' ||
                 d === 'Hungary' ||
                 d === 'Poland'
-                ? '#beaed4'
+                ? '#673ab7'
                 : d === 'United Kingdom'
-                    ? '#fbb4ae'
+                    ? '#e91e63'
                     : d === 'Denmark' ||
                         d === 'Sweden' ||
                         d === 'Estonia' ||
@@ -100,31 +100,88 @@ function getColor(d) {
                         d === 'Latvia' ||
                         d === 'Lithuania' ||
                         d === 'Norway'
-                        ? '#91bfdb'
+                        ? '#4a80f5'
                         : '#bdbdbd'
 }
 
 // Create overlay thingy
-var AntwerpenP = L.marker([51.29999, 4.30758]).bindPopup(
+var AntwerpenP = L.marker([51.29999, 4.30758], {
+    icon: L.icon({
+        iconUrl: "https://www.reshot.com/preview-assets/icons/RCX4VH7GD6/pin-RCX4VH7GD6.svg",
+        iconSize: [41, 35],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34]
+    })
+}).bindPopup(
     'Antwerpen Production'
 )
-WroclavP = L.marker([51.11862, 16.99842]).bindPopup('Wrocłav Productions')
-LyonP = L.marker([45.75555, 4.76737]).bindPopup('Lyon Productions')
-AntwerpenDC = L.marker([51.2999, 4.30758]).bindPopup(
+WroclavP = L.marker([51.11862, 16.99842], {
+    icon: L.icon({
+        iconUrl: "https://www.reshot.com/preview-assets/icons/RCX4VH7GD6/pin-RCX4VH7GD6.svg",
+        iconSize: [41, 35],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34]
+    })
+}).bindPopup('Wrocłav Productions')
+LyonP = L.marker([45.75555, 4.76737], {
+    icon: L.icon({
+        iconUrl: "https://www.reshot.com/preview-assets/icons/RCX4VH7GD6/pin-RCX4VH7GD6.svg",
+        iconSize: [41, 35],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34]
+    })
+}).bindPopup('Lyon Productions')
+AntwerpenDC = L.marker([51.2999, 4.30758], {
+    icon: L.icon({
+        iconUrl: "https://www.reshot.com/preview-assets/icons/RCX4VH7GD6/pin-RCX4VH7GD6.svg",
+        iconSize: [41, 35],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34]
+    })
+}).bindPopup(
     'Antwerpen Distribution Center'
 )
-WroclavDC = L.marker([51.11862, 16.99842]).bindPopup(
+WroclavDC = L.marker([51.11862, 16.99842], {
+    icon: L.icon({
+        iconUrl: "https://www.reshot.com/preview-assets/icons/RCX4VH7GD6/pin-RCX4VH7GD6.svg",
+        iconSize: [41, 35],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34]
+    })
+}).bindPopup(
     'Wrocłav Distribution Center'
 )
-LyonDC = L.marker([45.75555, 4.76737]).bindPopup(
+LyonDC = L.marker([45.75555, 4.76737], {
+    icon: L.icon({
+        iconUrl: "https://www.reshot.com/preview-assets/icons/RCX4VH7GD6/pin-RCX4VH7GD6.svg",
+        iconSize: [41, 35],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34]
+    })
+}).bindPopup(
     'Lyon Distribution Center'
 )
-BirminghamDC = L.marker([52.42853, -1.89877]).bindPopup(
+BirminghamDC = L.marker([52.42853, -1.89877], {
+    icon: L.icon({
+        iconUrl: "https://www.reshot.com/preview-assets/icons/RCX4VH7GD6/pin-RCX4VH7GD6.svg",
+        iconSize: [41, 35],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34]
+    })
+}).bindPopup(
     'Birmingham Distribution Center'
 )
-GoteborgDC = L.marker([57.72338, 11.85666]).bindPopup(
+GoteborgDC = L.marker([57.72338, 11.85666], {
+    icon: L.icon({
+        iconUrl: "https://www.reshot.com/preview-assets/icons/RCX4VH7GD6/pin-RCX4VH7GD6.svg",
+        iconSize: [41, 35],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34]
+    })
+}).bindPopup(
     'Göteborg Distribution Center'
 )
+
 
 var Plants = L.layerGroup([AntwerpenP, WroclavP, LyonP])
 DistC = L.layerGroup([
@@ -171,7 +228,7 @@ var customStyles = `
     background-color: white;
     padding: 15px;
     border-radius: 5px;
-    border: 1px solid #ccc;
+    border: 2px solid #ccc;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     opacity: 0.9;
 }
