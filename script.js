@@ -4,11 +4,7 @@ map.createPane('labels')
 map.getPane('labels').style.zIndex = 650
 map.getPane('labels').style.pointerEvents = 'none'
 
-// Add GeoJson
-var geoJson = L.geoJson(euData, {
-    style: style,
-    onEachFeature: onEachFeature
-}).addTo(map)
+var geoJson
 
 // Add tile layer
 L.tileLayer(
@@ -25,6 +21,12 @@ var positronLabels = L.tileLayer(
         pane: 'labels'
     }
 ).addTo(map)
+
+// Add GeoJson
+geoJson = L.geoJson(euData, {
+    style: style,
+    onEachFeature: onEachFeature
+}).addTo(map)
 
 // Function for color
 function style(features) {
@@ -102,7 +104,7 @@ function getColor(d) {
                         : '#bdbdbd'
 }
 
-// Create toggle overlay
+// Create overlay thingy
 var AntwerpenP = L.marker([51.29999, 4.30758]).bindPopup(
     'Antwerpen Production'
 )
@@ -143,39 +145,44 @@ var layerControl = L.control.layers(0, overlayMaps).addTo(map)
 // Scatterplot to SVG file
 var svgElement = document.getElementById('scatterplot')
 
-var legendContent = `
-<div class="legend" style="background-color: white; padding: 10px;">
-<h4>Legend</h4>
-<svg class="legend-svg" width="200" height="100">
-<!-- X-axis -->
-<line x1="30" y1="80" x2="190" y2="80" stroke="black" />
-<text x="30" y="95">0</text>
-<text x="70" y="95">50</text>
-<text x="110" y="95">100</text>
-<text x="150" y="95">150</text>
-<!-- Y-axis -->
-<line x1="30" y1="80" x2="30" y2="10" stroke="black" />
-<text x="15" y="80">0</text>
-<text x="15" y="60">20</text>
-<text x="15" y="40">40</text>
-<text x="15" y="20">60</text>
-<!-- Scatterplot points -->
-<circle cx="50" cy="70" r="5" fill="green" />
-<circle cx="100" cy="50" r="5" fill="blue" />
-<!-- Add more circles or other SVG elements as needed -->
-</svg>
+var legendContent =
+    `
+<div class="legend">
+    <svg class="legend-svg" width="300" height="250">
+        <!-- X-axis -->
+        <line x1="45" y1="200" x2="280" y2="200" stroke="black" />
+        <text x="45" y="215">0</text>
+        <text x="115" y="215">50</text>
+        <text x="185" y="215">100</text>
+        <text x="255" y="215">150</text>
+        <!-- Y-axis -->
+        <line x1="45" y1="200" x2="45" y2="40" stroke="black" />
+        <text x="25" y="200">0</text>
+        <text x="25" y="150">20</text>
+        <text x="25" y="100">40</text>
+        <text x="25" y="50">60</text>
+    </svg>
 </div>
 `
 
 // Define custom CSS styles
 var customStyles = `
 .legend {
-background-color: white;
-padding: 10px;
+    background-color: white;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    opacity: 0.9;
 }
 
 .legend-svg {
-/* Add styles for your scatterplot SVG */
+    font-family: Arial, sans-serif;
+}
+
+.legend-svg line {
+    stroke: #ccc; 
+    stroke-dasharray: 4; 
 }
 `
 
@@ -352,7 +359,7 @@ function updateLegendScatterplot(data) {
     // Generate pie chart SVG
     var pieChart = generatePieChart();
     // Update the content of the pie chart container with the new pie chart SVG
-    pieChartContainer.innerHTML = '<h4>Contributions from transportation stages</h4>' + pieChart;
+    pieChartContainer.innerHTML = pieChart;
 }
 
 // Function to update the pie chart with distribution data
