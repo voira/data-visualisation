@@ -45,6 +45,28 @@ $stmt2->execute();
 $result2 = $stmt2->get_result();
 $response['monthlyData'] = mysqli_fetch_all($result2, MYSQLI_ASSOC);
 
+// Assuming $conn is your mysqli connection object
+
+$sql3 = "SELECT 
+            p.PurchaseOrderQuantity AS PurchaseQuantity,
+            AVG(DATEDIFF(p.ActualGoodsReceiptDate, p.PlannedGoodsReceiptDate)) AS GoodsReceiptDate, 
+            AVG(DATEDIFF(p.ActualGoodsReceiptDate, p.PlannedGoodsReceiptDate)) AS ArrivalDateYard,
+            AVG(DATEDIFF(p.ActualVendorShipmentDate, p.PlannedVendorShipmentDate)) AS VendorShipmentDate
+        FROM 
+            Purchases p
+        WHERE 
+            p.PurchaseOrderQuantity IN (SELECT DISTINCT PurchaseOrderQuantity FROM Purchases)
+        GROUP BY 
+            p.PurchaseOrderQuantity";
+
+$stmt3 = $conn->prepare($sql3);
+$stmt3->execute();
+$result3 = $stmt3->get_result();
+$response['purchaseData'] = mysqli_fetch_all($result3, MYSQLI_ASSOC);
+
+// If needed, you can output or further process $response['purchaseData']
+
+
 // Convert the data to JSON format
 $jsonData = json_encode($response);
 

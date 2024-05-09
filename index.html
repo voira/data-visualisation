@@ -1,37 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Supply Chain Visualization</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
-      body,
-      html {
-        height: 100%;
-        margin: 0;
-        font-family: Arial, sans-serif;
-      }
-      #map {
-        width: 70%;
-        height: 100vh;
-        float: left;
-      }
-      #data-panel {
-        width: 30%;
-        height: 100vh;
-        float: right;
-        overflow: auto;
-      }
-      #myChart {
-        width: 100%;
-        height: 300px;
-      }
-    
-      #myChartPie {
-        width: 90%;
-        height: 100px; /* Smaller height for pie chart */
-    }
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            width: 50%;
+            height: 60vh;
+            float: left;
+        }
+        #data-panel {
+            width: 50%;
+            height: 60vh;
+            float: right;
+            overflow: auto;
+        }
+        #scatter-container {
+            width: 90%; /* Full width */
+            height: 20vh; /* Adjusted to not take full screen */
+        }
+        canvas {
+            width: 100%; /* Ensures canvas takes the full width of its container */
+            height: 0%; /* Height will adjust to fill the container */
+        }
     </style>
   </head>
   <body>
@@ -99,6 +97,11 @@
     <script type="text/javascript" src="script.js"></script>
     <canvas id="myChart"></canvas>
     <canvas id="myChartPie"></canvas>
+    <canvas id="myScatterChart" style="width: 100%; height: 300px;"></canvas>
+
+    </div>
+    <div id="scatter-container">
+      <canvas id="myScatterChart"></canvas>
     </div>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
@@ -201,6 +204,78 @@ document.getElementById("productSelect").addEventListener("change", fetchData);
 
 // Initial data fetch to populate charts
 fetchData();
+const ctxScatter = document.getElementById('myScatterChart').getContext('2d');
+const myScatterChart = new Chart(ctxScatter, {
+    type: 'scatter',
+    data: {
+        datasets: [{
+            label: 'Goods Receipt Date Difference',
+            data: [],
+            backgroundColor: 'rgba(255, 99, 132, 1)',
+            borderColor: 'rgba(255, 99, 132, 1)'
+        }, {
+            label: 'Arrival Date Yard Difference',
+            data: [],
+            backgroundColor: 'rgba(54, 162, 235, 1)',
+            borderColor: 'rgba(54, 162, 235, 1)'
+        }, {
+            label: 'Vendor Shipment Date Difference',
+            data: [],
+            backgroundColor: 'rgba(255, 206, 86, 1)',
+            borderColor: 'rgba(255, 206, 86, 1)'
+        }]
+    },
+    options: {
+        scales: {
+            x: {
+                type: 'linear',
+                position: 'bottom',
+                title: {
+                    display: true,
+                    text: 'Purchase Order Quantity'
+                }
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: 'Average Days Difference'
+                }
+            }
+        },
+        responsive: true,
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return `${context.dataset.label}: ${context.parsed.y} days`;
+                    }
+                }
+            }
+        }
+    }
+});
+
+function updateScatterChart(data) {
+    myScatterChart.data.datasets[0].data = data.map(item => ({ x: item.PurchaseQuantity, y: item.GoodsReceiptDate }));
+    myScatterChart.data.datasets[1].data = data.map(item => ({ x: item.PurchaseQuantity, y: item.ArrivalDateYard }));
+    myScatterChart.data.datasets[2].data = data.map(item => ({ x: item.PurchaseQuantity, y: item.VendorShipmentDate }));
+    myScatterChart.update();
+}
+
+// Function to fetch and update data, ensure this is triggered appropriately
+function fetchScatterData() {
+    const url = 'server.php?query=purchaseData'; // Adjust as per actual API
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            updateScatterChart(data.purchaseData);
+        })
+        .catch(error => console.error('Error loading scatter plot data:', error));
+}
+
+// Initial call to populate the scatter plot
+fetchScatterData();
 
     </script>
     

@@ -1,78 +1,109 @@
-// Initialize map
-var map = L.map("map").setView([51.505, -0.09], 4);
-map.createPane("labels");
-map.getPane("labels").style.zIndex = 650;
-map.getPane("labels").style.pointerEvents = "none";
+document.addEventListener("DOMContentLoaded", function () {
+  var map = L.map("map").setView([51.505, -0.09], 4);
+  map.createPane("labels");
+  map.getPane("labels").style.zIndex = 650;
+  map.getPane("labels").style.pointerEvents = "none";
 
-var geoJson;
+  // Add tile layer without labels
+  L.tileLayer(
+    "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png",
+    {
+      attribution: "©OpenStreetMap, ©CartoDB",
+    }
+  ).addTo(map);
 
-// Add tile layer
-L.tileLayer(
-  "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png",
-  {
-    attribution: "©OpenStreetMap, ©CartoDB",
-  }
-).addTo(map);
+  // Add a label layer in a separate pane for better control
+  L.tileLayer(
+    "https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png",
+    {
+      attribution: "©OpenStreetMap, ©CartoDB",
+      pane: "labels",
+    }
+  ).addTo(map);
 
-var positronLabels = L.tileLayer(
-  "https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png",
-  {
-    attribution: "©OpenStreetMap, ©CartoDB",
-    pane: "labels",
-  }
-).addTo(map);
+  // Load GeoJSON and add interactivity
+  var geoJson = L.geoJson(euData, {
+    // Ensure that `euData` is correctly referenced
+    style: function (features) {
+      return {
+        fillColor: getColor(features.properties.NAME), // Adjust color based on some property
+        weight: 1,
+        opacity: 1,
+        color: "white",
+        dashArray: "3",
+        fillOpacity: 0.7,
+      };
+    },
+    onEachFeature: function (features, layer) {
+      layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight,
+        click: function (e) {
+          selectCountry(e, features.properties.NAME); // Pass country name on click
+        },
+      });
+    },
+  }).addTo(map);
+});
 
-// Add GeoJson
-geoJson = L.geoJson(euData, {
-  style: style,
-  onEachFeature: onEachFeature,
-}).addTo(map);
-
-// Function for color
-function style(features) {
-  return {
-    fillColor: getColor(features.properties.NAME),
-    weight: 1,
-    opacity: 1,
-    color: "white",
-    dashArray: "1",
-    fillOpacity: 0.5,
-  };
-}
-
-// Sum of all map functions
-function onEachFeature(features, layer) {
-  layer.on({
-    mouseover: highlightFeature,
-    mouseout: resetHighlight,
-    click: zoomToFeature,
-  });
-  layer.bindPopup(features.properties.NAME);
-}
-
-// Function for hover
+// Function to highlight the feature on mouseover
 function highlightFeature(e) {
   var layer = e.target;
-
   layer.setStyle({
-    weight: 1,
+    weight: 5,
     color: "#666",
     dashArray: "",
     fillOpacity: 0.7,
   });
-
-  layer.bringToFront();
+  if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+    layer.bringToFront();
+  }
 }
 
-// Function for unhover
+// Function to reset highlight on mouseout
 function resetHighlight(e) {
+  var geoJson = e.target;
   geoJson.resetStyle(e.target);
 }
 
-// Zooms in to country
-function zoomToFeature(e) {
-  map.fitBounds(e.target.getBounds());
+// Function to select a country and update dropdown
+function selectCountry(e, countryName) {
+  var select = document.getElementById("countrySelect");
+  for (var i = 0; i < select.options.length; i++) {
+    if (select.options[i].text === countryName) {
+      select.selectedIndex = i;
+      select.dispatchEvent(new Event("change"));
+      break;
+    }
+  }
 }
+
+// Fetching data and updating charts
+function fetchData() {
+  var country = document.getElementById("countrySelect").value;
+  var year = document.getElementById("yearSelect").value;
+  var product = document.getElementById("productSelect").value;
+  var url = `server.php?country=${encodeURIComponent(
+    country
+  )}&year=${encodeURIComponent(year)}&product=${encodeURIComponent(product)}`;
+
+  fetch(url)
+    .then((response) => response.json())
+    .then((data) => {
+      updateBarChart(data.monthlyData);
+      updatePieChart(data.categoryData);
+    })
+    .catch((error) => console.error("Error:", error));
+}
+
+document.getElementById("countrySelect").addEventListener("change", fetchData);
+document.getElementById("yearSelect").addEventListener("change", fetchData);
+document.getElementById("productSelect").addEventListener("change", fetchData);
+
+// Ensure that the page is fully loaded before initializing map and fetching data
+window.onload = function () {
+  fetchData();
+};
 
 // Color picker function for the map
 
@@ -247,7 +278,7 @@ AntwerpenP.bindPopup("Antwerpen Production").on("click", function () {
   ]);
 });
 
-WroclavP.bindPopup("Wrocłav Productions").on("click", function () {
+WroclavP.bindPopup("Wrocław Productions").on("click", function () {
   updateLegendScatterplot([
     { timeDifference: 30 }, // Sample data point 1
     { timeDifference: 50 }, // Sample data point 2
@@ -269,7 +300,7 @@ AntwerpenDC.bindPopup("Antwerpen Distribution").on("click", function () {
     // Add more data points as needed
   ]);
 });
-WroclavDC.bindPopup("Wrocłlav Distribution Center").on("click", function () {
+WroclavDC.bindPopup("Wrocław Distribution Center").on("click", function () {
   updateLegendScatterplot([
     { timeDifference: 2 }, // Sample data point 1
     { timeDifference: 3 }, // Sample data point 2
@@ -321,46 +352,3 @@ L.tileLayer(
     pane: "labels",
   }
 ).addTo(map);
-
-// DAria
-// Function to update chart and dropdowns based on selected country on the map
-function updateData() {
-  const country = selectedCountry; // Assume selectedCountry is globally tracked
-  const year = document.getElementById("yearSelect").value;
-  const product = document.getElementById("productSelect").value;
-
-  // Update dropdown to reflect the map selection
-  document.getElementById("countrySelect").value = country;
-
-  // Fetch new data
-  fetchData(country, year, product);
-}
-
-function fetchData(country, year, product) {
-  const url = `server.php?country=${encodeURIComponent(
-    country
-  )}&year=${encodeURIComponent(year)}&product=${encodeURIComponent(product)}`;
-  fetch(url)
-    .then((response) => response.json())
-    .then((data) => updateChart(data))
-    .catch((error) => console.error("Error fetching data:", error));
-}
-
-function updateChart(data) {
-  myChart.data.labels = data.map((item) => `Month ${item.Month}`);
-  myChart.data.datasets[0].data = data.map((item) => item.TotalQuantity);
-  myChart.update();
-}
-
-// Click event on map features
-geoJson.on("click", function (e) {
-  selectedCountry = e.layer.feature.properties.NAME; // Store selected country
-  updateData(); // Update chart when country is clicked
-});
-
-// Initialize chart on load
-fetchData(
-  document.getElementById("countrySelect").value,
-  document.getElementById("yearSelect").value,
-  document.getElementById("productSelect").value
-);
