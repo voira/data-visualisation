@@ -62,8 +62,13 @@ function highlightFeature(e) {
 
 // Function to reset highlight on mouseout
 function resetHighlight(e) {
-  var geoJson = e.target;
-  geoJson.resetStyle(e.target);
+  var layer = e.target; // Correctly reference the layer
+  layer.setStyle({
+    weight: 1,
+    color: "white",
+    dashArray: "3",
+    fillOpacity: 0.7,
+  });
 }
 
 // Function to select a country and update dropdown
@@ -171,3 +176,184 @@ var overlayMaps = {
 
 // Add the layer control element to map
 var layerControl = L.control.layers(0, overlayMaps).addTo(map);
+
+//Scatterplot to SVG file
+var svgElement = document.getElementById("scatterplot");
+
+var legendContent = `
+<div class="legend" style="background-color: white; padding: 10px;">
+<h4>Legend</h4>
+<svg class="legend-svg" width="200" height="100">
+<!-- X-axis -->
+<line x1="30" y1="80" x2="190" y2="80" stroke="black" />
+<text x="30" y="95">0</text>
+<text x="70" y="95">50</text>
+<text x="110" y="95">100</text>
+<text x="150" y="95">150</text>
+<!-- Y-axis -->
+<line x1="30" y1="80" x2="30" y2="10" stroke="black" />
+<text x="15" y="80">0</text>
+<text x="15" y="60">20</text>
+<text x="15" y="40">40</text>
+<text x="15" y="20">60</text>
+<!-- Scatterplot points -->
+<circle cx="50" cy="70" r="5" fill="green" />
+<circle cx="100" cy="50" r="5" fill="blue" />
+<!-- Add more circles or other SVG elements as needed -->
+</svg>
+</div>
+`;
+
+// Define custom CSS styles
+var customStyles = `
+.legend {
+background-color: white;
+padding: 10px;
+}
+
+.legend-svg {
+/* Add styles for your scatterplot SVG */
+}
+`;
+
+// Create a custom legend control
+var legendControl = L.control({ position: "bottomright" });
+
+legendControl.onAdd = function (map) {
+  var div = L.DomUtil.create("div", "legend-container");
+  div.innerHTML = legendContent;
+  return div;
+};
+
+// Add the legend control to the map
+legendControl.addTo(map);
+
+// Inject custom styles into the document
+var style = document.createElement("style");
+style.innerHTML = customStyles;
+document.head.appendChild(style);
+
+// Function to update the scatterplot in the legend
+function updateLegendScatterplot(data) {
+  var legendSvg = document.querySelector(".legend-svg");
+
+  // Remove existing scatterplot points
+  legendSvg.querySelectorAll("circle").forEach(function (circle) {
+    circle.remove();
+  });
+
+  // Add new scatterplot points based on the provided data
+  data.forEach(function (d, i) {
+    var circle = document.createElementNS(
+      "http://www.w3.org/2000/svg",
+      "circle"
+    );
+    circle.setAttribute("cx", 50 + i * 50); // Adjust x-coordinate based on index
+    circle.setAttribute("cy", 50 - d.timeDifference); // Adjust y-coordinate based on data
+    circle.setAttribute("r", 5);
+    circle.setAttribute("fill", "steelblue");
+    circle.classList.add("legend-dot"); // Add class to identify the dots
+    legendSvg.appendChild(circle);
+  });
+
+  // Attach click event listeners to the blue dots
+  legendSvg.querySelectorAll(".legend-dot").forEach(function (dot) {
+    dot.addEventListener("click", function (event) {
+      // Prevent click event propagation
+      event.stopPropagation();
+      // Display a message when the blue dot is clicked
+      alert("Hey you clicked me!");
+    });
+  });
+}
+
+// Attach click event listener to legend SVG to prevent propagation
+document
+  .querySelector(".legend-svg")
+  .addEventListener("click", function (event) {
+    event.stopPropagation();
+  });
+
+// Attach event listeners to marker popups to update legend scatterplot
+AntwerpenP.bindPopup("Antwerpen Production").on("click", function () {
+  updateLegendScatterplot([
+    { timeDifference: 20 }, // Sample data point 1
+    { timeDifference: 40 }, // Sample data point 2
+    // Add more data points as needed
+  ]);
+});
+
+WroclavP.bindPopup("Wrocław Productions").on("click", function () {
+  updateLegendScatterplot([
+    { timeDifference: 30 }, // Sample data point 1
+    { timeDifference: 50 }, // Sample data point 2
+    // Add more data points as needed
+  ]);
+});
+
+LyonP.bindPopup("Lyon Productions").on("click", function () {
+  updateLegendScatterplot([
+    { timeDifference: 40 }, // Sample data point 1
+    { timeDifference: 60 }, // Sample data point 2
+    // Add more data points as needed
+  ]);
+});
+AntwerpenDC.bindPopup("Antwerpen Distribution").on("click", function () {
+  updateLegendScatterplot([
+    { timeDifference: 30 }, // Sample data point 1
+    { timeDifference: 5 }, // Sample data point 2
+    // Add more data points as needed
+  ]);
+});
+WroclavDC.bindPopup("Wrocław Distribution Center").on("click", function () {
+  updateLegendScatterplot([
+    { timeDifference: 2 }, // Sample data point 1
+    { timeDifference: 3 }, // Sample data point 2
+    // Add more data points as needed
+  ]);
+});
+LyonDC.bindPopup("Lyon Distribution Center").on("click", function () {
+  updateLegendScatterplot([
+    { timeDifference: 30 }, // Sample data point 1
+    { timeDifference: 65 }, // Sample data point 2
+    // Add more data points as needed
+  ]);
+});
+GoteborgDC.bindPopup("Göteborg Distribution Center").on("click", function () {
+  updateLegendScatterplot([
+    { timeDifference: 22 }, // Sample data point 1
+    { timeDifference: 22 }, // Sample data point 2
+    // Add more data points as needed
+  ]);
+});
+BirminghamDC.bindPopup("Birmingham Distribution Center").on(
+  "click",
+  function () {
+    updateLegendScatterplot([
+      { timeDifference: 20 }, // Sample data point 1
+      { timeDifference: 30 }, // Sample data point 2
+      // Add more data points as needed
+    ]);
+  }
+);
+// Initialize the map
+var map = L.map("map").setView([51.505, -0.09], 4);
+map.createPane("labels");
+map.getPane("labels").style.zIndex = 650;
+map.getPane("labels").style.pointerEvents = "none";
+
+// Add base and label layers
+L.tileLayer(
+  "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png",
+  {
+    attribution: "©OpenStreetMap, ©CartoDB",
+  }
+).addTo(map);
+
+L.tileLayer(
+  "https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png",
+  {
+    attribution: "©OpenStreetMap, ©CartoDB",
+    pane: "labels",
+  }
+).addTo(map);
