@@ -2,4 +2,5 @@ Here are presented the php files that were used for updating the database. In fo
   
 Below the photo of the database
 
-![Uploading Screenshot 2024-05-09 at 13.03.02.png…]()
+
+![Screenshot 2024-05-09 at 13 03 02](https://github.com/voira/data_visualisation/assets/67764136/8928f763-1aa8-4dd8-bff6-c7dd0caeba74)
