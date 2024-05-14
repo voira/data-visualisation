@@ -14,22 +14,25 @@
       }
       #map {
         width: 50%;
-        height: 60vh;
+        height: 100vh;
         float: left;
       }
       #data-panel {
-        width: 50%;
-        height: 60vh;
+        width: 47%;
+        height: 50vh;
+        float: right;
+        overflow: auto;
+        padding-left: 10px;
+      }
+      #scatter-container {
+        width: 48.5%;
+        height: 50vh;
         float: right;
         overflow: auto;
       }
-      #scatter-container {
-        width: 100%;
-        height: 20vh; /* Adjusted to not take full screen */
-      }
       canvas {
         width: 100%; /* Ensures canvas takes the full width of its container */
-        height: 10%; /* Height will adjust to fill the container */
+        height: 100%; /* Height will adjust to fill the container */
       }
     </style>
   </head>
@@ -104,511 +107,508 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script type="text/javascript" src="europe.js"></script>
     <script type="text/javascript" src="script.js"></script>
-    <canvas id="myChart"></canvas>
-    <canvas id="myChartPie"></canvas>
-    <canvas id="myScatterChart" style="width: 100%; height: 300px"></canvas>
-
+    
+    <div id="scatter-container">
+      <canvas id="myScatterChart"></canvas>
+    </div>
+  
     <script>
       // Month mapping
       const monthNames = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ];
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December'
+      ]
 
       // Fetching data and updating charts
       function fetchData() {
-        const country = document.getElementById("countrySelect").value;
-        const year = document.getElementById("yearSelect").value;
-        const product = document.getElementById("productSelect").value;
-        const plant = document.getElementById("plantSelect").value;
+        const country = document.getElementById('countrySelect').value
+        const year = document.getElementById('yearSelect').value
+        const product = document.getElementById('productSelect').value
+        const plant = document.getElementById('plantSelect').value
         const url = `server.php?country=${encodeURIComponent(
           country
         )}&year=${encodeURIComponent(year)}&product=${encodeURIComponent(
           product
-        )}&plant=${encodeURIComponent(plant)}`;
+        )}&plant=${encodeURIComponent(plant)}`
 
         fetch(url)
-          .then((response) => response.json())
-          .then((data) => {
+          .then(response => response.json())
+          .then(data => {
             updateBarChart(
               data.monthlyData,
               data.forecastData,
               data.purchaseOrderData
-            );
-            updatePieChart(data.categoryData);
+            )
+            updatePieChart(data.categoryData)
           })
-          .catch((error) => console.error("Error:", error));
+          .catch(error => console.error('Error:', error))
       }
 
-      document.addEventListener("DOMContentLoaded", function () {
-        const ctxBar = document.getElementById("myChart").getContext("2d");
+      document.addEventListener('DOMContentLoaded', function () {
+        const ctxBar = document.getElementById('myChart').getContext('2d')
         const myBarChart = new Chart(ctxBar, {
-          type: "bar",
+          type: 'bar',
           data: {
             labels: [],
             datasets: [
               {
-                label: "Total Order Quantities by Month",
-                backgroundColor: "rgba(54, 162, 235, 0.2)",
-                borderColor: "rgba(54, 162, 235, 1)",
+                label: 'Total Order Quantities by Month',
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
                 borderWidth: 1,
-                data: [],
-              },
-            ],
+                data: []
+              }
+            ]
           },
           options: {
-            scales: { y: { beginAtZero: true } },
-          },
-        });
+            scales: { y: { beginAtZero: true } }
+          }
+        })
 
-        const ctxPie = document.getElementById("myChartPie").getContext("2d");
+        const ctxPie = document.getElementById('myChartPie').getContext('2d')
         const myPieChart = new Chart(ctxPie, {
-          type: "pie",
+          type: 'pie',
           data: {
             labels: [],
             datasets: [
               {
-                label: "Product Categories",
-                backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
-                data: [],
-              },
-            ],
+                label: 'Product Categories',
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56'],
+                data: []
+              }
+            ]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            legend: { position: "bottom" },
-          },
-        });
+            legend: { position: 'bottom' }
+          }
+        })
         function fetchData() {
-          const country = document.getElementById("countrySelect").value;
-          const year = document.getElementById("yearSelect").value;
-          const product = document.getElementById("productSelect").value;
-          const plant = document.getElementById("plantSelect").value;
+          const country = document.getElementById('countrySelect').value
+          const year = document.getElementById('yearSelect').value
+          const product = document.getElementById('productSelect').value
+          const plant = document.getElementById('plantSelect').value
           const url = `server.php?country=${encodeURIComponent(
             country
           )}&year=${encodeURIComponent(year)}&product=${encodeURIComponent(
             product
-          )}&plant=${encodeURIComponent(plant)}`;
+          )}&plant=${encodeURIComponent(plant)}`
 
           fetch(url)
-            .then((response) => response.json())
-            .then((data) => {
-              updateBarChart(data.monthlyData);
-              updatePieChart(data.categoryData);
+            .then(response => response.json())
+            .then(data => {
+              updateBarChart(data.monthlyData)
+              updatePieChart(data.categoryData)
             })
-            .catch((error) => console.error("Error:", error));
+            .catch(error => console.error('Error:', error))
         }
         function updateBarChart(monthlyData, forecastData, purchaseOrderData) {
           myBarChart.data.labels = monthlyData.map(
-            (item) => monthNames[item.Month - 1]
-          );
+            item => monthNames[item.Month - 1]
+          )
 
           // Update monthly bar data
           myBarChart.data.datasets[0].data = monthlyData.map(
-            (item) => item.TotalQuantity
-          );
+            item => item.TotalQuantity
+          )
 
           // Forecast line data
           let forecastDataset = myBarChart.data.datasets.find(
-            (dataset) => dataset.label === "Forecast Data by Month"
-          );
+            dataset => dataset.label === 'Forecast Data by Month'
+          )
           if (!forecastDataset) {
             myBarChart.data.datasets.push({
-              label: "Forecast Data by Month",
-              data: forecastData.map((item) => item.TotalQuantity),
-              borderColor: "rgb(75, 192, 192)",
-              type: "line",
+              label: 'Forecast Data by Month',
+              data: forecastData.map(item => item.TotalQuantity),
+              borderColor: 'rgb(75, 192, 192)',
+              type: 'line',
               fill: false,
-              tension: 0.1,
-            });
+              tension: 0.1
+            })
           } else {
-            forecastDataset.data = forecastData.map(
-              (item) => item.TotalQuantity
-            );
+            forecastDataset.data = forecastData.map(item => item.TotalQuantity)
           }
 
           // Purchase order line data
           let purchaseOrderDataset = myBarChart.data.datasets.find(
-            (dataset) => dataset.label === "Purchase Order Data by Month"
-          );
+            dataset => dataset.label === 'Purchase Order Data by Month'
+          )
           if (!purchaseOrderDataset) {
             myBarChart.data.datasets.push({
-              label: "Purchase Order Data by Month",
-              data: purchaseOrderData.map((item) => item.TotalQuantity),
-              borderColor: "rgb(153, 102, 255)",
-              type: "line",
+              label: 'Purchase Order Data by Month',
+              data: purchaseOrderData.map(item => item.TotalQuantity),
+              borderColor: 'rgb(153, 102, 255)',
+              type: 'line',
               fill: false,
-              tension: 0.1,
-            });
+              tension: 0.1
+            })
           } else {
             purchaseOrderDataset.data = purchaseOrderData.map(
-              (item) => item.TotalQuantity
-            );
+              item => item.TotalQuantity
+            )
           }
 
-          myBarChart.update();
+          myBarChart.update()
         }
         function updatePieChart(categoryData) {
           myPieChart.data.labels = categoryData.map(
-            (item) => item.ProductCategory
-          );
+            item => item.ProductCategory
+          )
           myPieChart.data.datasets[0].data = categoryData.map(
-            (item) => item.TotalQuantity
-          );
-          myPieChart.update();
+            item => item.TotalQuantity
+          )
+          myPieChart.update()
         }
 
         // Modify fetchData function to fetch and pass all necessary data
         function fetchData() {
-          const country = document.getElementById("countrySelect").value;
-          const year = document.getElementById("yearSelect").value;
-          const product = document.getElementById("productSelect").value;
-          const plant = document.getElementById("plantSelect").value;
+          const country = document.getElementById('countrySelect').value
+          const year = document.getElementById('yearSelect').value
+          const product = document.getElementById('productSelect').value
+          const plant = document.getElementById('plantSelect').value
           const url = `server.php?country=${encodeURIComponent(
             country
           )}&year=${encodeURIComponent(year)}&product=${encodeURIComponent(
             product
-          )}&plant=${encodeURIComponent(plant)}`;
+          )}&plant=${encodeURIComponent(plant)}`
 
           fetch(url)
-            .then((response) => response.json())
-            .then((data) => {
+            .then(response => response.json())
+            .then(data => {
               updateBarChart(
                 data.monthlyData,
                 data.forecastData,
                 data.purchaseOrderData
-              ); // Pass all three datasets
-              updatePieChart(data.categoryData);
+              ) // Pass all three datasets
+              updatePieChart(data.categoryData)
             })
-            .catch((error) => console.error("Error:", error));
+            .catch(error => console.error('Error:', error))
         }
 
         function updatePieChart(categoryData) {
           myPieChart.data.labels = categoryData.map(
-            (item) => item.ProductCategory
-          );
+            item => item.ProductCategory
+          )
           myPieChart.data.datasets[0].data = categoryData.map(
-            (item) => item.TotalQuantity
-          );
-          myPieChart.update();
+            item => item.TotalQuantity
+          )
+          myPieChart.update()
         }
 
         // Event listeners for interactive updates
         document
-          .getElementById("yearSelect")
-          .addEventListener("change", fetchData);
+          .getElementById('yearSelect')
+          .addEventListener('change', fetchData)
         document
-          .getElementById("countrySelect")
-          .addEventListener("change", fetchData);
+          .getElementById('countrySelect')
+          .addEventListener('change', fetchData)
         document
-          .getElementById("productSelect")
-          .addEventListener("change", fetchData);
+          .getElementById('productSelect')
+          .addEventListener('change', fetchData)
         document
-          .getElementById("plantSelect")
-          .addEventListener("change", fetchData);
+          .getElementById('plantSelect')
+          .addEventListener('change', fetchData)
 
-        fetchData(); // Initial fetch to populate charts
-      });
+        fetchData() // Initial fetch to populate charts
+      })
       const ctxScatter = document
-        .getElementById("myScatterChart")
-        .getContext("2d");
+        .getElementById('myScatterChart')
+        .getContext('2d')
       const myScatterChart = new Chart(ctxScatter, {
-        type: "scatter",
+        type: 'scatter',
         data: {
           datasets: [
             {
-              label: "Goods Receipt Date Difference",
+              label: 'Goods Receipt Date Difference',
               data: [],
-              backgroundColor: "rgba(255, 99, 132, 1)",
-              borderColor: "rgba(255, 99, 132, 1)",
+              backgroundColor: 'rgba(255, 99, 132, 1)',
+              borderColor: 'rgba(255, 99, 132, 1)'
             },
             {
-              label: "Arrival Date Yard Difference",
+              label: 'Arrival Date Yard Difference',
               data: [],
-              backgroundColor: "rgba(54, 162, 235, 1)",
-              borderColor: "rgba(54, 162, 235, 1)",
+              backgroundColor: 'rgba(54, 162, 235, 1)',
+              borderColor: 'rgba(54, 162, 235, 1)'
             },
             {
-              label: "Vendor Shipment Date Difference",
+              label: 'Vendor Shipment Date Difference',
               data: [],
-              backgroundColor: "rgba(255, 206, 86, 1)",
-              borderColor: "rgba(255, 206, 86, 1)",
-            },
-          ],
+              backgroundColor: 'rgba(255, 206, 86, 1)',
+              borderColor: 'rgba(255, 206, 86, 1)'
+            }
+          ]
         },
         options: {
           scales: {
             x: {
-              type: "linear",
-              position: "bottom",
+              type: 'linear',
+              position: 'bottom',
               title: {
                 display: true,
-                text: "Purchase Order Quantity",
-              },
+                text: 'Purchase Order Quantity'
+              }
             },
             y: {
               title: {
                 display: true,
-                text: "Average Days Difference",
-              },
-            },
+                text: 'Average Days Difference'
+              }
+            }
           },
           responsive: true,
           plugins: {
             tooltip: {
               callbacks: {
                 label: function (context) {
-                  return `${context.dataset.label}: ${context.parsed.y} days`;
-                },
-              },
-            },
-          },
-        },
-      });
+                  return `${context.dataset.label}: ${context.parsed.y} days`
+                }
+              }
+            }
+          }
+        }
+      })
 
       function updateScatterChart(data) {
-        myScatterChart.data.datasets[0].data = data.map((item) => ({
+        myScatterChart.data.datasets[0].data = data.map(item => ({
           x: item.PurchaseQuantity,
-          y: item.GoodsReceiptDate,
-        }));
-        myScatterChart.data.datasets[1].data = data.map((item) => ({
+          y: item.GoodsReceiptDate
+        }))
+        myScatterChart.data.datasets[1].data = data.map(item => ({
           x: item.PurchaseQuantity,
-          y: item.ArrivalDateYard,
-        }));
-        myScatterChart.data.datasets[2].data = data.map((item) => ({
+          y: item.ArrivalDateYard
+        }))
+        myScatterChart.data.datasets[2].data = data.map(item => ({
           x: item.PurchaseQuantity,
-          y: item.VendorShipmentDate,
-        }));
-        myScatterChart.update();
+          y: item.VendorShipmentDate
+        }))
+        myScatterChart.update()
       }
 
       // Function to fetch and update data, ensure this is triggered appropriately
       function fetchScatterData() {
-        const url = "server.php?query=purchaseData"; // Adjust as per actual API
+        const url = 'server.php?query=purchaseData' // Adjust as per actual API
 
         fetch(url)
-          .then((response) => response.json())
-          .then((data) => {
-            updateScatterChart(data.purchaseData);
+          .then(response => response.json())
+          .then(data => {
+            updateScatterChart(data.purchaseData)
           })
-          .catch((error) =>
-            console.error("Error loading scatter plot data:", error)
-          );
+          .catch(error =>
+            console.error('Error loading scatter plot data:', error)
+          )
       }
 
       // Initial call to populate the scatter plot
-      fetchScatterData();
-      const ctxLine = document.getElementById("myLineChart").getContext("2d");
+      fetchScatterData()
+      const ctxLine = document.getElementById('myLineChart').getContext('2d')
       let myLineChart = new Chart(ctxLine, {
-        type: "line",
+        type: 'line',
         data: {
           labels: [], // Month and Year labels
           datasets: [
             {
-              label: "Total Monthly Quantity",
+              label: 'Total Monthly Quantity',
               data: [], // Data will be set when fetched
-              borderColor: "#36A2EB",
-              backgroundColor: "rgba(54, 162, 235, 0.5)",
-            },
-          ],
+              borderColor: '#36A2EB',
+              backgroundColor: 'rgba(54, 162, 235, 0.5)'
+            }
+          ]
         },
         options: {
           scales: {
             y: {
-              beginAtZero: true,
-            },
-          },
-        },
-      });
+              beginAtZero: true
+            }
+          }
+        }
+      })
       function updateBarChart(monthlyData, forecastData, purchaseOrderData) {
         // Ensure labels for the bar chart from the monthly data
         myBarChart.data.labels = monthlyData.map(
-          (item) => monthNames[item.Month - 1]
-        );
+          item => monthNames[item.Month - 1]
+        )
 
         // Update the bar dataset
         myBarChart.data.datasets[0].data = monthlyData.map(
-          (item) => item.TotalQuantity
-        );
+          item => item.TotalQuantity
+        )
 
         // Forecast line data
         let forecastDataset = myBarChart.data.datasets.find(
-          (dataset) => dataset.label === "Forecast Data by Month"
-        );
+          dataset => dataset.label === 'Forecast Data by Month'
+        )
         if (!forecastDataset) {
           myBarChart.data.datasets.push({
-            label: "Forecast Data by Month",
-            data: forecastData.map((item) => item.TotalQuantity),
-            borderColor: "rgb(75, 192, 192)",
-            type: "line",
+            label: 'Forecast Data by Month',
+            data: forecastData.map(item => item.TotalQuantity),
+            borderColor: 'rgb(75, 192, 192)',
+            type: 'line',
             fill: false,
             tension: 0.1,
-            borderWidth: 2,
-          });
+            borderWidth: 2
+          })
         } else {
-          forecastDataset.data = forecastData.map((item) => item.TotalQuantity);
+          forecastDataset.data = forecastData.map(item => item.TotalQuantity)
         }
 
         // Purchase order line data
         let purchaseOrderDataset = myBarChart.data.datasets.find(
-          (dataset) => dataset.label === "Purchase Order Data by Month"
-        );
+          dataset => dataset.label === 'Purchase Order Data by Month'
+        )
         if (!purchaseOrderDataset) {
           myBarChart.data.datasets.push({
-            label: "Purchase Order Data by Month",
-            data: purchaseOrderData.map((item) => item.TotalQuantity),
-            borderColor: "rgb(153, 102, 255)",
-            type: "line",
+            label: 'Purchase Order Data by Month',
+            data: purchaseOrderData.map(item => item.TotalQuantity),
+            borderColor: 'rgb(153, 102, 255)',
+            type: 'line',
             fill: false,
             tension: 0.1,
-            borderWidth: 2,
-          });
+            borderWidth: 2
+          })
         } else {
           purchaseOrderDataset.data = purchaseOrderData.map(
-            (item) => item.TotalQuantity
-          );
+            item => item.TotalQuantity
+          )
         }
 
         // Update the chart with all changes
-        myBarChart.update();
+        myBarChart.update()
       }
 
       // Modify the fetchData function to call updateBarChart with both sets of data
       function fetchData() {
-        const country = document.getElementById("countrySelect").value;
-        const year = document.getElementById("yearSelect").value;
-        const product = document.getElementById("productSelect").value;
-        const plant = document.getElementById("plantSelect").value;
+        const country = document.getElementById('countrySelect').value
+        const year = document.getElementById('yearSelect').value
+        const product = document.getElementById('productSelect').value
+        const plant = document.getElementById('plantSelect').value
         const url = `server.php?country=${encodeURIComponent(
           country
         )}&year=${encodeURIComponent(year)}&product=${encodeURIComponent(
           product
-        )}&plant=${encodeURIComponent(plant)}`;
+        )}&plant=${encodeURIComponent(plant)}`
 
         fetch(url)
-          .then((response) => response.json())
-          .then((data) => {
+          .then(response => response.json())
+          .then(data => {
             updateBarChart(
               data.monthlyData,
               data.forecastData,
               data.purchaseOrderData
-            );
-            updatePieChart(data.categoryData);
+            )
+            updatePieChart(data.categoryData)
           })
-          .catch((error) => console.error("Error:", error));
+          .catch(error => console.error('Error:', error))
       }
 
       document
-        .getElementById("countrySelect")
-        .addEventListener("change", fetchData);
+        .getElementById('countrySelect')
+        .addEventListener('change', fetchData)
       document
-        .getElementById("yearSelect")
-        .addEventListener("change", fetchData);
+        .getElementById('yearSelect')
+        .addEventListener('change', fetchData)
       document
-        .getElementById("productSelect")
-        .addEventListener("change", fetchData);
+        .getElementById('productSelect')
+        .addEventListener('change', fetchData)
       document
-        .getElementById("plantSelect")
-        .addEventListener("change", fetchData);
+        .getElementById('plantSelect')
+        .addEventListener('change', fetchData)
 
-      fetchData(); // Initial data fetch to populate charts
+      fetchData() // Initial data fetch to populate charts
 
       // Initialize the pie chart
       // Initialize the pie chart
-      let pieCtx = document.getElementById("myChartPie").getContext("2d");
+      let pieCtx = document.getElementById('myChartPie').getContext('2d')
       let myPieChart = new Chart(pieCtx, {
-        type: "pie",
+        type: 'pie',
         data: {
           labels: [],
           datasets: [
             {
-              label: "Product Categories",
+              label: 'Product Categories',
               backgroundColor: [
-                "#FF6384",
-                "#36A2EB",
-                "#FFCE56",
-                "#4BC0C0",
-                "#F77825",
-                "#FF9F40",
-                "#77FFEC",
-                "#FF6384",
-                "#845EF7",
-                "#D25565",
+                '#FF6384',
+                '#36A2EB',
+                '#FFCE56',
+                '#4BC0C0',
+                '#F77825',
+                '#FF9F40',
+                '#77FFEC',
+                '#FF6384',
+                '#845EF7',
+                '#D25565'
               ],
-              data: [],
-            },
-          ],
+              data: []
+            }
+          ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
           legend: {
-            position: "bottom",
-          },
-        },
-      });
+            position: 'bottom'
+          }
+        }
+      })
 
       // Function to update pie chart
       function updatePieChart(categoryData) {
-        myPieChart.data.labels = categoryData.map(
-          (item) => item.ProductCategory
-        );
+        myPieChart.data.labels = categoryData.map(item => item.ProductCategory)
         myPieChart.data.datasets[0].data = categoryData.map(
-          (item) => item.TotalQuantity
-        );
-        myPieChart.update();
+          item => item.TotalQuantity
+        )
+        myPieChart.update()
       }
 
       // Adjusted fetchData function
       function fetchData() {
-        const country = document.getElementById("countrySelect").value;
-        const year = document.getElementById("yearSelect").value;
-        const product = document.getElementById("productSelect").value;
-        const plant = document.getElementById("plantSelect").value;
+        const country = document.getElementById('countrySelect').value
+        const year = document.getElementById('yearSelect').value
+        const product = document.getElementById('productSelect').value
+        const plant = document.getElementById('plantSelect').value
         const url = `server.php?country=${encodeURIComponent(
           country
         )}&year=${encodeURIComponent(year)}&product=${encodeURIComponent(
           product
-        )}&plant=${encodeURIComponent(plant)}`;
+        )}&plant=${encodeURIComponent(plant)}`
 
         fetch(url)
-          .then((response) => response.json())
-          .then((data) => {
+          .then(response => response.json())
+          .then(data => {
             updateBarChart(
               data.monthlyData,
               data.forecastData,
               data.purchaseOrderData
-            );
-            updatePieChart(data.categoryData); // Now correctly updates the pie chart with category data
+            )
+            updatePieChart(data.categoryData) // Now correctly updates the pie chart with category data
           })
-          .catch((error) => console.error("Error:", error));
+          .catch(error => console.error('Error:', error))
       }
 
       // Setup initial fetch and listeners
       document
-        .getElementById("yearSelect")
-        .addEventListener("change", fetchData);
+        .getElementById('yearSelect')
+        .addEventListener('change', fetchData)
       document
-        .getElementById("countrySelect")
-        .addEventListener("change", fetchData);
+        .getElementById('countrySelect')
+        .addEventListener('change', fetchData)
       document
-        .getElementById("productSelect")
-        .addEventListener("change", fetchData);
+        .getElementById('productSelect')
+        .addEventListener('change', fetchData)
       document
-        .getElementById("plantSelect")
-        .addEventListener("change", fetchData);
-      fetchData(); // Initial data fetch to populate charts
+        .getElementById('plantSelect')
+        .addEventListener('change', fetchData)
+      fetchData() // Initial data fetch to populate charts
     </script>
   </body>
 </html>
